@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/fragment_friends">
+
+    <fragment
+        android:id="@+id/fragment_friends"
+        android:name="com.example.steamapp.FragmentFriends"
+        tools:layout="@layout/fragment_friends">
+
+        <action
+            android:id="@+id/to_fragment_details"
+            app:destination="@id/fragment_details"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_details"
+        android:name="com.example.steamapp.FragmentDetails"
+        tools:layout="@layout/fragment_details"/>
+</navigation>

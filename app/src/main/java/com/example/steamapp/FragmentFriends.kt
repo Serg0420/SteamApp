@@ -1,5 +1,6 @@
 package com.example.steamapp
 
+import android.content.ClipData
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,17 +8,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
 class FragmentFriends : Fragment() {
 
-    private val playerInformationLst= mutableListOf<PlayerInfo>()
+    private val playerInformationLst= mutableListOf<InputItem.PlayerInfo>()
 
-    private var currentRequest2: Call<PlayersResponse>? = null
-    private var currentRequest: Call<FriendList>? = null
     private val adapter by lazy { UserAdapter(requireContext()) }
     private var _binding: FragmentFriendsBinding? = null
 
@@ -45,6 +46,24 @@ class FragmentFriends : Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
+        with(binding) {
+
+            val linearLM=LinearLayoutManager(requireContext())
+
+            friendsLst.layoutManager=linearLM
+            friendsLst.addVerticalSeparation()
+            friendsLst.addPagination(linearLM,ELEMENTS_BEFORE_END){
+
+            }
+            getDataFromSteamToRv(0, 0)
+            getDataFromSteamToRv(2, 8)
+            friendsLst.adapter = adapter
+
+        }
+    }
+
+    private fun getDataFromSteamToRv(downloadMore: Int, currentPageSize: Int){
+
         val retrofit = Retrofit.Builder()
             .baseUrl(" http://api.steampowered.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -52,23 +71,21 @@ class FragmentFriends : Fragment() {
 
         val steamApi = retrofit.create<SteamApi>()
 
-        exRequest(
+        getFriendsToRv(
 
             steamApi.getUsersFriends(
                 "EA8CD62FA7C21007003DEF64FF96E20C",
                 76561198277362398,
                 "friend"
             ),
-            steamApi
-
+            steamApi,
+            downloadMore,
+            currentPageSize
         )
 
-        with(binding) {
-            friendsLst.adapter = adapter
-        }
     }
 
-    private fun exRequest(currentRequest: Call<FriendList>, steamApi: SteamApi) {
+    private fun getFriendsToRv(currentRequest: Call<FriendList>, steamApi: SteamApi,downloadMore: Int,currentPageSize:Int) {
 
         currentRequest.enqueue(object : Callback<FriendList> {
 
@@ -84,14 +101,31 @@ class FragmentFriends : Fragment() {
                         steamidStrLst.add(it.steamid)
                     }
 
-                    steamidStrLst.forEach {
+                    val lstSize=steamidStrLst.size
+                    var downloadingElem:Int=currentPageSize
+                    var toDownload=downloadMore
 
-                        exRequest2(
-                            steamApi.getUser(
-                                "EA8CD62FA7C21007003DEF64FF96E20C",
-                                it
+
+                    if(toDownload==0 && currentPageSize<=0){toDownload=PAGE_SIZE}
+                    if(toDownload+currentPageSize>lstSize){toDownload= lstSize-currentPageSize}
+
+
+                    steamidStrLst.forEachIndexed{ index,it->
+
+                        if (
+                           // (downloadingElem-currentPageSize >= 0) &&
+                            (index>=downloadingElem) &&
+                            (downloadingElem <= currentPageSize + toDownload-1)
+                        ) {
+
+                            getFrendsInfoToRv(
+                                steamApi.getUser(
+                                    "EA8CD62FA7C21007003DEF64FF96E20C",
+                                    it
+                                )
                             )
-                        )
+                            downloadingElem++
+                        }
 
                     }
 
@@ -116,9 +150,9 @@ class FragmentFriends : Fragment() {
         })
     }
 
-    private fun exRequest2(currentRequest2: Call<PlayersResponse>) {
+    private fun getFrendsInfoToRv(currentRequest: Call<PlayersResponse>) {
 
-        currentRequest2.enqueue(object : Callback<PlayersResponse> {
+        currentRequest.enqueue(object : Callback<PlayersResponse> {
 
             override fun onResponse(
                 call: Call<PlayersResponse>,
@@ -131,7 +165,7 @@ class FragmentFriends : Fragment() {
                         response.body() ?: return//ПЕРЕПРОВЕРИТЬ!!!!!тут ошибки выкинуть
 
                     playerInformationLst.add(playersResp.response.players[0])
-                    adapter.submitList(playerInformationLst)
+                    adapter.submitList(playerInformationLst.map{it})
 
                 } else {
                     //тут ошибки выкинуть
@@ -156,12 +190,14 @@ class FragmentFriends : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        currentRequest2?.cancel()
-        currentRequest?.cancel()
     }
 
     fun errorToasting(errorStr: String) {
         Toast.makeText(requireContext(), errorStr, Toast.LENGTH_LONG).show()
     }
 
+    companion object{
+        private const val ELEMENTS_BEFORE_END=2
+        private const val PAGE_SIZE=8
+    }
 }

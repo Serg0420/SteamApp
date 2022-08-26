@@ -7,11 +7,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.example.steamapp.databinding.LoadingUserBinding
 import com.example.steamapp.databinding.UserLstElemBinding
 
 class UserViewHolder(private val binding:UserLstElemBinding):RecyclerView.ViewHolder(binding.root){
 
-    fun bind (item:PlayerInfo){
+    fun bind (item:InputItem.PlayerInfo){
         with(binding){
             avatarPreviewImgv.load(item.avatarFull)
             nickTxtv.text=item.personaName
@@ -20,33 +21,55 @@ class UserViewHolder(private val binding:UserLstElemBinding):RecyclerView.ViewHo
 
 }
 
-class UserAdapter (context:Context):ListAdapter<PlayerInfo,UserViewHolder>(DIFF_UTIL){
+class LoadingUserViewHolder(
+    private val binding:LoadingUserBinding
+    ):RecyclerView.ViewHolder(binding.root){}
+
+class UserAdapter (context:Context):ListAdapter<InputItem,RecyclerView.ViewHolder>(DIFF_UTIL){
 
     private val layoutInflater=LayoutInflater.from(context)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+    override fun getItemViewType(position: Int): Int {
+        return when(getItem(position)){
+            is InputItem.PlayerInfo-> USER_ELEMENT
+            InputItem.LoadingElement ->LOADING_ELEMENT
 
-        return UserViewHolder(
-
-            binding = UserLstElemBinding.inflate(layoutInflater,parent,false)
-        )
+        }
     }
 
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
-        holder.bind(getItem(position))
+        return when(viewType){
+            USER_ELEMENT->UserViewHolder(
+                binding = UserLstElemBinding.inflate(layoutInflater,parent,false)
+            )
+            LOADING_ELEMENT-> LoadingUserViewHolder(
+                binding =LoadingUserBinding.inflate(layoutInflater,parent,false)
+            )
+            else-> error("Unknown input view")
+
+
+        }
+
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as UserViewHolder).bind(getItem(position) as InputItem.PlayerInfo)
     }
 
     companion object{
 
-        private val DIFF_UTIL=object :DiffUtil.ItemCallback<PlayerInfo>(){
+        private const val USER_ELEMENT=0
+        private const val LOADING_ELEMENT=1
 
-            override fun areItemsTheSame(oldItem: PlayerInfo, newItem: PlayerInfo): Boolean {
+        private val DIFF_UTIL=object :DiffUtil.ItemCallback<InputItem>(){
 
-                return oldItem.personaName==newItem.personaName
+            override fun areItemsTheSame(oldItem: InputItem, newItem: InputItem): Boolean {
+
+                return oldItem==newItem
             }
 
-            override fun areContentsTheSame(oldItem: PlayerInfo, newItem: PlayerInfo): Boolean {
+            override fun areContentsTheSame(oldItem: InputItem, newItem: InputItem): Boolean {
 
                 //уточни тут усли будет много данных
                 return oldItem==newItem

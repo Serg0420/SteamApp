@@ -2,16 +2,16 @@ package com.example.steamapp
 
 import com.google.gson.annotations.SerializedName
 
-sealed class InputItem{
+sealed class InputItem {
 
-data class PlayerInfo(
-    @SerializedName("personaname")
-    val personaName: String,
-    @SerializedName("avatarfull")
-    val avatarFull:String
-):InputItem()
+    data class PlayerInfo(
+        @SerializedName("personaname")
+        val personaName: String,
+        @SerializedName("avatarfull")
+        val avatarFull: String
+    ) : InputItem()
 
-object LoadingElement:InputItem()
+    object LoadingElement : InputItem()
 }
 
 data class Players(

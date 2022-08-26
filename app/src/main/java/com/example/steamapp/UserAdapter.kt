@@ -54,7 +54,11 @@ class UserAdapter (context:Context):ListAdapter<InputItem,RecyclerView.ViewHolde
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as UserViewHolder).bind(getItem(position) as InputItem.PlayerInfo)
+
+        if(holder !is UserViewHolder)return
+        val item=getItem(position)
+        if(item !is InputItem.PlayerInfo)return
+        holder.bind(item)
     }
 
     companion object{

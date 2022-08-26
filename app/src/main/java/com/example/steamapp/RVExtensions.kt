@@ -1,6 +1,7 @@
 package com.example.steamapp
 
 
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
@@ -30,6 +31,9 @@ fun RecyclerView.addPagination(
 
             if(elementsBeforeEnd+lastVisElemPos>=countOfElem){
                 pointReached()
+                println("-------------------@--------------------")
+                println("-------------------!@#$%^^&*--------------------")
+                println("-------------------!--------------------")
             }
         }
     })

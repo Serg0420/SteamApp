@@ -18,9 +18,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 class FragmentFriends : Fragment() {
 
     private val playerInformationLst= mutableListOf<InputItem.PlayerInfo>()
+    private var isLoading=false
 
     private val adapter by lazy { UserAdapter(requireContext()) }
     private var _binding: FragmentFriendsBinding? = null
+    private var currentPageSize=0
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -50,26 +52,33 @@ class FragmentFriends : Fragment() {
 
             val linearLM=LinearLayoutManager(requireContext())
 
+            getDataFromSteamToRv(0, currentPageSize,true)
+            currentPageSize= PAGE_SIZE
+
             friendsLst.layoutManager=linearLM
             friendsLst.addVerticalSeparation()
             friendsLst.addPagination(linearLM,ELEMENTS_BEFORE_END){
 
-            }
-            getDataFromSteamToRv(0, 0)
-            getDataFromSteamToRv(2, 8)
-            friendsLst.adapter = adapter
+                getDataFromSteamToRv(DOWNLOAD_ELEMENTS_COUNT, currentPageSize,false)
+                currentPageSize=+DOWNLOAD_ELEMENTS_COUNT
 
+            }
+            friendsLst.adapter = adapter
         }
     }
 
-    private fun getDataFromSteamToRv(downloadMore: Int, currentPageSize: Int){
 
+    private fun getDataFromSteamToRv(downloadMore: Int, currentPSize: Int, isFirstCall:Boolean){
+
+        if(isLoading)return
+       // isLoading=true
         val retrofit = Retrofit.Builder()
             .baseUrl(" http://api.steampowered.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val steamApi = retrofit.create<SteamApi>()
+
 
         getFriendsToRv(
 
@@ -80,12 +89,13 @@ class FragmentFriends : Fragment() {
             ),
             steamApi,
             downloadMore,
-            currentPageSize
+            currentPSize,
+            isFirstCall
         )
 
     }
 
-    private fun getFriendsToRv(currentRequest: Call<FriendList>, steamApi: SteamApi,downloadMore: Int,currentPageSize:Int) {
+    private fun getFriendsToRv(currentRequest: Call<FriendList>, steamApi: SteamApi,downloadMore: Int,currentPSize:Int,isFirstCall:Boolean) {
 
         currentRequest.enqueue(object : Callback<FriendList> {
 
@@ -97,25 +107,28 @@ class FragmentFriends : Fragment() {
 
                     val friendLst = response.body() ?: return//ПЕРЕПРОВЕРИТЬ!!!!!тут ошибки выкинуть
 
-                    (friendLst.friendsList.friends).forEach {
-                        steamidStrLst.add(it.steamid)
+                    if(isFirstCall){
+                        (friendLst.friendsList.friends).forEach {
+                            steamidStrLst.add(it.steamid)
+                        }
                     }
 
+
                     val lstSize=steamidStrLst.size
-                    var downloadingElem:Int=currentPageSize
+                    var downloadingElem:Int=currentPSize
                     var toDownload=downloadMore
 
 
-                    if(toDownload==0 && currentPageSize<=0){toDownload=PAGE_SIZE}
-                    if(toDownload+currentPageSize>lstSize){toDownload= lstSize-currentPageSize}
+                    if(toDownload==0 && currentPSize<=0){toDownload=PAGE_SIZE}
+                    if(toDownload+currentPSize>lstSize){toDownload= lstSize-currentPSize}
 
 
                     steamidStrLst.forEachIndexed{ index,it->
 
-                        if (
+                        if ((toDownload!=0)&&
                            // (downloadingElem-currentPageSize >= 0) &&
                             (index>=downloadingElem) &&
-                            (downloadingElem <= currentPageSize + toDownload-1)
+                            (downloadingElem <= currentPSize + toDownload-1)
                         ) {
 
                             getFrendsInfoToRv(
@@ -165,13 +178,20 @@ class FragmentFriends : Fragment() {
                         response.body() ?: return//ПЕРЕПРОВЕРИТЬ!!!!!тут ошибки выкинуть
 
                     playerInformationLst.add(playersResp.response.players[0])
-                    adapter.submitList(playerInformationLst.map{it})
+
+                    val prevItems=adapter.currentList.dropLastWhile {
+                        it==InputItem.LoadingElement
+                    }
+                    val newItems=
+                        playerInformationLst.map{it}.minus(prevItems)+InputItem.LoadingElement
+                    adapter.submitList(prevItems+newItems)
 
                 } else {
                     //тут ошибки выкинуть
                     errorToasting(response.errorBody().toString())
                 }
 
+             //   isLoading=false
             }
 
             override fun onFailure(call: Call<PlayersResponse>, t: Throwable) {
@@ -193,11 +213,12 @@ class FragmentFriends : Fragment() {
     }
 
     fun errorToasting(errorStr: String) {
-        Toast.makeText(requireContext(), errorStr, Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), errorStr, Toast.LENGTH_SHORT).show()
     }
 
     companion object{
         private const val ELEMENTS_BEFORE_END=2
         private const val PAGE_SIZE=8
+        private const val DOWNLOAD_ELEMENTS_COUNT=2
     }
 }

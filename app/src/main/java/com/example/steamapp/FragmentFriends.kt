@@ -1,6 +1,7 @@
 package com.example.steamapp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 class FragmentFriends : Fragment() {
 
     private var playerInformationLst = mutableListOf<InputItem.PlayerInfo>()
-    private var isLoading = false
     private var errorMsg: String? = null
     private var getFriendsIdsRequest: Call<FriendList>? = null
     private var getUserProfileRequest: Call<PlayersResponse>? = null
@@ -44,7 +44,6 @@ class FragmentFriends : Fragment() {
         )
 
     }
-
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -81,10 +80,10 @@ class FragmentFriends : Fragment() {
                 getUserProfileRequest = null
                 adapter.submitList(mutableListOf<InputItem>())
                 playerInformationLst = mutableListOf()
-                isLoading = false
                 errorMsg = null
                 //загружаем первую страницу пользователей
-                getDataFromSteamToRv(0, 0) { swipeRefresh.isRefreshing = false }
+                currentPageSize=0
+                getDataFromSteamToRv(0, currentPageSize) { swipeRefresh.isRefreshing = false }
                 currentPageSize = PAGE_SIZE
             }
 
@@ -118,9 +117,6 @@ class FragmentFriends : Fragment() {
         currentPSize: Int,
         onRefreshFinished: () -> Unit = {}
     ) {
-
-        if (isLoading) return
-        isLoading = true
 
         val retrofit = Retrofit.Builder()
             .baseUrl(STEAM_BASE_URL)
@@ -195,15 +191,29 @@ class FragmentFriends : Fragment() {
 
                     steamidStrLst.forEachIndexed { index, it ->
 
-                        if ((toDownload != 0) &&
-                            (index >= downloadingElem) &&//чтобы не получать тех-же юзеров
-                            (downloadingElem <= currentPSize + toDownload - 1)
-                        ) {
+                        if (lstSize-1>=index) {//не грузим если загрузились все пользователи
+                            if ((toDownload != 0) &&
+                                (index >= downloadingElem) &&//чтобы не получать тех-же юзеров
+                                (downloadingElem <= currentPSize + toDownload - 1)
+                            ) {
 
-                            getUserProfileRequest = steamApi.getUser(STEAM_API_KEY, it)
-                            getFriendsInfoToRv()
-                            downloadingElem++
+                                getUserProfileRequest = steamApi.getUser(STEAM_API_KEY, it)
+                                getFriendsInfoToRv()
+                                downloadingElem++
+                            }
                         }
+                    }
+
+                    //убираем элемент загрузки если загрузились все друзья
+                    val size=binding.friendsLst.layoutManager?.itemCount
+                    Log.d("qqq",size.toString())
+                    if(lstSize+1==size){
+
+                        adapter.submitList(
+                            adapter.currentList.dropLastWhile {
+                            it == InputItem.LoadingElement
+                            }
+                        )
                     }
 
                     onRefreshFinished()
@@ -258,7 +268,6 @@ class FragmentFriends : Fragment() {
                             } + InputItem.LoadingElement
 
                         adapter.submitList(prevItems + newItems)
-                        isLoading = false
 
                     } else {
 
@@ -294,7 +303,6 @@ class FragmentFriends : Fragment() {
 
         errorMsg = errorStr
         Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()
-        isLoading = false
 
     }
 
@@ -311,9 +319,9 @@ class FragmentFriends : Fragment() {
         private const val RELATIONSHIP = "friend"
 
         //друзей в стиме мало, по этому и такие маленькие параметры задал
-        private const val ELEMENTS_BEFORE_END = 2
+        private const val ELEMENTS_BEFORE_END = 4
         private const val PAGE_SIZE = 10
-        private const val DOWNLOAD_ELEMENTS_COUNT = 3
+        private const val DOWNLOAD_ELEMENTS_COUNT = 4
 
     }
 }

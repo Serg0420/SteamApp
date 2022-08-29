@@ -19,5 +19,10 @@
     <fragment
         android:id="@+id/fragment_details"
         android:name="com.example.steamapp.FragmentDetails"
-        tools:layout="@layout/fragment_details"/>
+        tools:layout="@layout/fragment_details">
+
+        <argument
+            android:name="personaName"
+            app:argType="string" />
+    </fragment>
 </navigation>

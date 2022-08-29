@@ -12,6 +12,8 @@ sealed class InputItem {
     ) : InputItem()
 
     object LoadingElement : InputItem()
+
+    object ErrorElement:InputItem()
 }
 
 data class Players(
@@ -24,12 +26,12 @@ data class PlayersResponse(
 
 //------------------------------------------
 
-    data class UserFriend(
-        val steamid: String,
-        val relationship:String,
-        @SerializedName("friend_since")
-        val friendSince:String
-    )
+data class UserFriend(
+    val steamid: String,
+    val relationship:String,
+    @SerializedName("friend_since")
+    val friendSince:String
+)
 
 
 

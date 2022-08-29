@@ -7,15 +7,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.example.steamapp.databinding.ErrorElemBinding
 import com.example.steamapp.databinding.LoadingUserBinding
 import com.example.steamapp.databinding.UserLstElemBinding
 
-class UserViewHolder(private val binding:UserLstElemBinding):RecyclerView.ViewHolder(binding.root){
+class UserViewHolder(
+    private val binding:UserLstElemBinding,
+    private val onUserElemClicked:(InputItem.PlayerInfo)->Unit
+):RecyclerView.ViewHolder(binding.root){
 
     fun bind (item:InputItem.PlayerInfo){
         with(binding){
             avatarPreviewImgv.load(item.avatarFull)
             nickTxtv.text=item.personaName
+
+            root.setOnClickListener {
+                onUserElemClicked(item)
+            }
         }
     }
 
@@ -23,9 +31,25 @@ class UserViewHolder(private val binding:UserLstElemBinding):RecyclerView.ViewHo
 
 class LoadingUserViewHolder(
     private val binding:LoadingUserBinding
-    ):RecyclerView.ViewHolder(binding.root){}
+):RecyclerView.ViewHolder(binding.root){}
 
-class UserAdapter (context:Context):ListAdapter<InputItem,RecyclerView.ViewHolder>(DIFF_UTIL){
+class ErrorViewHolder(
+    binding:ErrorElemBinding,
+    onTryAgainBtnClicked:()->Unit
+):RecyclerView.ViewHolder(binding.root){
+
+    init {
+        binding.tryAgainBtn.setOnClickListener {
+            onTryAgainBtnClicked()
+        }
+    }
+}
+
+class UserAdapter (
+    context:Context,
+    private val onTryAgainBtnClicked: ()->Unit,
+    private val onUserElemClicked:(InputItem.PlayerInfo)->Unit
+):ListAdapter<InputItem,RecyclerView.ViewHolder>(DIFF_UTIL){
 
     private val layoutInflater=LayoutInflater.from(context)
 
@@ -33,7 +57,7 @@ class UserAdapter (context:Context):ListAdapter<InputItem,RecyclerView.ViewHolde
         return when(getItem(position)){
             is InputItem.PlayerInfo-> USER_ELEMENT
             InputItem.LoadingElement ->LOADING_ELEMENT
-
+            InputItem.ErrorElement-> ERROR_ELEMENT
         }
     }
 
@@ -41,10 +65,16 @@ class UserAdapter (context:Context):ListAdapter<InputItem,RecyclerView.ViewHolde
 
         return when(viewType){
             USER_ELEMENT->UserViewHolder(
-                binding = UserLstElemBinding.inflate(layoutInflater,parent,false)
+                binding = UserLstElemBinding.inflate(layoutInflater,parent,false),
+                onUserElemClicked=onUserElemClicked
             )
             LOADING_ELEMENT-> LoadingUserViewHolder(
                 binding =LoadingUserBinding.inflate(layoutInflater,parent,false)
+            )
+            ERROR_ELEMENT->ErrorViewHolder(
+                binding = ErrorElemBinding.inflate(layoutInflater,parent,false),
+                onTryAgainBtnClicked=onTryAgainBtnClicked
+
             )
             else-> error("Unknown input view")
 
@@ -55,16 +85,22 @@ class UserAdapter (context:Context):ListAdapter<InputItem,RecyclerView.ViewHolde
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        if(holder !is UserViewHolder)return
         val item=getItem(position)
-        if(item !is InputItem.PlayerInfo)return
-        holder.bind(item)
+
+        when(holder){
+
+            is UserViewHolder-> {
+                if(item !is InputItem.PlayerInfo)return
+                holder.bind(item)
+            }
+        }
     }
 
     companion object{
 
         private const val USER_ELEMENT=0
         private const val LOADING_ELEMENT=1
+        private const val ERROR_ELEMENT=2
 
         private val DIFF_UTIL=object :DiffUtil.ItemCallback<InputItem>(){
 

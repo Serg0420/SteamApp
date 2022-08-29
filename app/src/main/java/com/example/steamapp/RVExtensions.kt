@@ -31,9 +31,7 @@ fun RecyclerView.addPagination(
 
             if(elementsBeforeEnd+lastVisElemPos>=countOfElem){
                 pointReached()
-                println("-------------------@--------------------")
-                println("-------------------!@#$%^^&*--------------------")
-                println("-------------------!--------------------")
+                Log.d("debug4","4: $pointReached")
             }
         }
     })

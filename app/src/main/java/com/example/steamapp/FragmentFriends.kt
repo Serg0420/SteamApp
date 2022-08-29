@@ -2,6 +2,7 @@ package com.example.steamapp
 
 import android.content.ClipData
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,17 +13,36 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.steamapp.databinding.FragmentFriendsBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import okhttp3.OkHttpClient
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
 class FragmentFriends : Fragment() {
 
-    private val playerInformationLst= mutableListOf<InputItem.PlayerInfo>()
-    private var isLoading=false
+    private val playerInformationLst = mutableListOf<InputItem.PlayerInfo>()
+    private var isLoading = false
+    private var errorMsg: String? = null
 
-    private val adapter by lazy { UserAdapter(requireContext()) }
+
+
+    private val adapter by lazy {
+        UserAdapter(
+            requireContext(),
+            {
+                errorMsg = null
+                getDataFromSteamToRv(DOWNLOAD_ELEMENTS_COUNT, currentPageSize)
+            },
+            {
+                findNavController().navigate(
+                    FragmentFriendsDirections.toFragmentDetails(it.personaName)
+                )
+            }
+
+        )
+
+    }
     private var _binding: FragmentFriendsBinding? = null
-    private var currentPageSize=0
+    private var currentPageSize = 0
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -50,102 +70,123 @@ class FragmentFriends : Fragment() {
 
         with(binding) {
 
-            val linearLM=LinearLayoutManager(requireContext())
+//            toolbar.setNavigationOnClickListener {
+//                findNavController().navigate(
+//                    FragmentFriendsDirections.toFragmentDetails()
+//
+//                )
+//            }
 
-            getDataFromSteamToRv(0, currentPageSize,true)
-            currentPageSize= PAGE_SIZE
+            val linearLM = LinearLayoutManager(requireContext())
 
-            friendsLst.layoutManager=linearLM
+            getDataFromSteamToRv(0, currentPageSize)
+            currentPageSize = PAGE_SIZE
+
+            friendsLst.layoutManager = linearLM
             friendsLst.addVerticalSeparation()
-            friendsLst.addPagination(linearLM,ELEMENTS_BEFORE_END){
+            friendsLst.addPagination(linearLM, ELEMENTS_BEFORE_END) {
 
-                getDataFromSteamToRv(DOWNLOAD_ELEMENTS_COUNT, currentPageSize,false)
-                currentPageSize=+DOWNLOAD_ELEMENTS_COUNT
+                getDataFromSteamToRv(DOWNLOAD_ELEMENTS_COUNT, currentPageSize)
+                //около суток ковырял баг, оказалось тут вместо += написал =+, я чуть моник не разбил...
+                currentPageSize += DOWNLOAD_ELEMENTS_COUNT
+                Log.d("getDataFromSteamToRv", "getDataFromSteamToRv: $currentPageSize")
 
             }
             friendsLst.adapter = adapter
+
         }
     }
 
 
-    private fun getDataFromSteamToRv(downloadMore: Int, currentPSize: Int, isFirstCall:Boolean){
+    private fun getDataFromSteamToRv(downloadMore: Int, currentPSize: Int) {
 
-        if(isLoading)return
-       // isLoading=true
+        if (isLoading) return
+        isLoading = true
+
         val retrofit = Retrofit.Builder()
-            .baseUrl(" http://api.steampowered.com/")
+            .baseUrl(STEAM_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val steamApi = retrofit.create<SteamApi>()
 
-
         getFriendsToRv(
 
             steamApi.getUsersFriends(
-                "EA8CD62FA7C21007003DEF64FF96E20C",
-                76561198277362398,
+                STEAM_API_KEY,
+                MY_STEAM_ID,
                 "friend"
             ),
             steamApi,
             downloadMore,
-            currentPSize,
-            isFirstCall
+            currentPSize
         )
+    }
+
+    override fun onDestroyView() {
+
+        super.onDestroyView()
+        _binding = null
 
     }
 
-    private fun getFriendsToRv(currentRequest: Call<FriendList>, steamApi: SteamApi,downloadMore: Int,currentPSize:Int,isFirstCall:Boolean) {
+    private fun getFriendsToRv(
+        currentRequest: Call<FriendList>,
+        steamApi: SteamApi,
+        downloadMore: Int,
+        currentPSize: Int
+    ) {
 
         currentRequest.enqueue(object : Callback<FriendList> {
 
             override fun onResponse(call: Call<FriendList>, response: Response<FriendList>) {
 
-                val steamidStrLst= mutableListOf<String>()
+                val steamidStrLst = mutableListOf<String>()
 
                 if (response.isSuccessful) {
 
                     val friendLst = response.body() ?: return//ПЕРЕПРОВЕРИТЬ!!!!!тут ошибки выкинуть
 
-                    if(isFirstCall){
-                        (friendLst.friendsList.friends).forEach {
-                            steamidStrLst.add(it.steamid)
-                        }
+                    (friendLst.friendsList.friends).forEach {
+                        steamidStrLst.add(it.steamid)
+                        Log.d("debug2", "steamidStrLst: $steamidStrLst")
+
                     }
 
-
-                    val lstSize=steamidStrLst.size
-                    var downloadingElem:Int=currentPSize
-                    var toDownload=downloadMore
-
-
-                    if(toDownload==0 && currentPSize<=0){toDownload=PAGE_SIZE}
-                    if(toDownload+currentPSize>lstSize){toDownload= lstSize-currentPSize}
+                    val lstSize = steamidStrLst.size
+                    var downloadingElem: Int = currentPSize
+                    var toDownload = downloadMore
 
 
-                    steamidStrLst.forEachIndexed{ index,it->
+                    if (toDownload == 0 && currentPSize <= 0) {
+                        toDownload = PAGE_SIZE
+                    }
+                    if (toDownload + currentPSize > lstSize) {
+                        toDownload = lstSize - currentPSize
+                    }
 
-                        if ((toDownload!=0)&&
-                           // (downloadingElem-currentPageSize >= 0) &&
-                            (index>=downloadingElem) &&
-                            (downloadingElem <= currentPSize + toDownload-1)
+                    steamidStrLst.forEachIndexed { index, it ->
+                        //isLoading=true
+
+                        if ((toDownload != 0) &&
+                            (index >= downloadingElem) &&
+                            (downloadingElem <= currentPSize + toDownload - 1)
                         ) {
 
                             getFrendsInfoToRv(
-                                steamApi.getUser(
-                                    "EA8CD62FA7C21007003DEF64FF96E20C",
-                                    it
-                                )
+                                steamApi.getUser(STEAM_API_KEY, it)
                             )
+
                             downloadingElem++
                         }
-
                     }
+
 
                 } else {
 
-                    errorToasting(response.errorBody().toString())
-                    //тут ошибки выкинуть
+                    handleError(response.errorBody().toString())
+                    isLoading = false
+
                 }
 
             }
@@ -154,8 +195,8 @@ class FragmentFriends : Fragment() {
 
                 if (!call.isCanceled) {
 
-                    //tyt vivedem oshibky
-                    errorToasting(t.toString())
+                    handleError(t.toString())
+                    isLoading = false
 
                 }
 
@@ -179,46 +220,64 @@ class FragmentFriends : Fragment() {
 
                     playerInformationLst.add(playersResp.response.players[0])
 
-                    val prevItems=adapter.currentList.dropLastWhile {
-                        it==InputItem.LoadingElement
+                    if (errorMsg == null) {
+
+                        val prevItems = adapter.currentList.dropLastWhile {
+                            it == InputItem.LoadingElement
+                        }
+                        val newItems = playerInformationLst.map { it }
+                            .minus(prevItems).dropLastWhile {
+                                it == InputItem.ErrorElement
+                            } + InputItem.LoadingElement
+
+                        adapter.submitList(prevItems + newItems)
+
+                    } else {
+
+                        val prevItems = adapter.currentList.dropLastWhile {
+                            it == InputItem.LoadingElement
+                        }
+
+                        adapter.submitList(prevItems.minus(InputItem.ErrorElement) + InputItem.ErrorElement)
+
                     }
-                    val newItems=
-                        playerInformationLst.map{it}.minus(prevItems)+InputItem.LoadingElement
-                    adapter.submitList(prevItems+newItems)
+
+                    isLoading = false
 
                 } else {
-                    //тут ошибки выкинуть
-                    errorToasting(response.errorBody().toString())
-                }
 
-             //   isLoading=false
+                    handleError(response.errorBody().toString())
+                    isLoading = false
+
+                }
             }
 
             override fun onFailure(call: Call<PlayersResponse>, t: Throwable) {
 
                 if (!call.isCanceled) {
-
-                    //tyt vivedem oshibky
-                    errorToasting(t.toString())
-
+                    handleError(t.toString())
                 }
 
             }
         })
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    fun handleError(errorStr: String) {
+
+        errorMsg = errorStr
+        Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()
+        isLoading = false
+
     }
 
-    fun errorToasting(errorStr: String) {
-        Toast.makeText(requireContext(), errorStr, Toast.LENGTH_SHORT).show()
-    }
+    companion object {
 
-    companion object{
-        private const val ELEMENTS_BEFORE_END=2
-        private const val PAGE_SIZE=8
-        private const val DOWNLOAD_ELEMENTS_COUNT=2
+        private const val STEAM_BASE_URL = " http://api.steampowered.com/"
+        private const val STEAM_API_KEY = "EA8CD62FA7C21007003DEF64FF96E20C"
+        private const val MY_STEAM_ID = 76561198277362398
+        private const val ELEMENTS_BEFORE_END = 1
+        private const val PAGE_SIZE = 10
+        private const val DOWNLOAD_ELEMENTS_COUNT = 2
+
     }
 }

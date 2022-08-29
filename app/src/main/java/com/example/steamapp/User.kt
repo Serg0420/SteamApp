@@ -8,12 +8,15 @@ sealed class InputItem {
         @SerializedName("personaname")
         val personaName: String,
         @SerializedName("avatarfull")
-        val avatarFull: String
+        val avatarFull: String,
+        val steamid: String,
+        @SerializedName("personastate")
+        val personaState: String
     ) : InputItem()
 
     object LoadingElement : InputItem()
 
-    object ErrorElement:InputItem()
+    object ErrorElement : InputItem()
 }
 
 data class Players(
@@ -28,14 +31,10 @@ data class PlayersResponse(
 
 data class UserFriend(
     val steamid: String,
-    val relationship:String,
+    val relationship: String,
     @SerializedName("friend_since")
-    val friendSince:String
+    val friendSince: String
 )
-
-
-
-
 
 data class Friends(
     val friends: List<UserFriend>

@@ -12,7 +12,7 @@
 
         <action
             android:id="@+id/to_fragment_details"
-            app:destination="@id/fragment_details"/>
+            app:destination="@id/fragment_details" />
 
     </fragment>
 
@@ -23,6 +23,15 @@
 
         <argument
             android:name="personaName"
+            app:argType="string" />
+        <argument
+            android:name="avatarFull"
+            app:argType="string" />
+        <argument
+            android:name="steamid"
+            app:argType="string" />
+        <argument
+            android:name="personaState"
             app:argType="string" />
     </fragment>
 </navigation>

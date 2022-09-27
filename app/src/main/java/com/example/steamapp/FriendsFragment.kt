@@ -9,6 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -16,16 +20,17 @@ class FriendsFragment : Fragment() {
 
     private var playerInformationLst = mutableListOf<InputItem.PlayerInfo>()
     private var errorMsg: String? = null
-    private var getFriendsIdsRequest: Call<FriendList>? = null
-    private var getUserProfileRequest: Call<PlayersResponse>? = null
+    private var getFriendsIdsRequest: FriendList? = null
+    private var getUserProfileRequest: PlayersResponse? = null
     private var _binding: FragmentFriendsBinding? = null
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private val adapter by lazy {
         UserAdapter(
             requireContext(),
             {
                 errorMsg = null
-                loadDataFromSteamToRv()
+                //loadDataFromSteamToRv()
             },
             {
                 findNavController().navigate(
@@ -72,31 +77,83 @@ class FriendsFragment : Fragment() {
             val linearLM = LinearLayoutManager(requireContext())
 
             swipeRefresh.setOnRefreshListener {
-                getFriendsIdsRequest?.cancel()
-                getUserProfileRequest?.cancel()
+                //getFriendsIdsRequest?.cancel()
+                //getUserProfileRequest?.cancel()
                 getFriendsIdsRequest = null
                 getUserProfileRequest = null
                 adapter.submitList(mutableListOf<InputItem>())
                 playerInformationLst = mutableListOf()
                 errorMsg = null
+                scope.launch { LoadDataInRV{swipeRefresh.isRefreshing = false} }
                 //загружаем страницу пользователей
-                loadDataFromSteamToRv { swipeRefresh.isRefreshing = false }
+                //loadDataFromSteamToRv { swipeRefresh.isRefreshing = false }
             }
 
             friendsLst.layoutManager = linearLM
             //добавляем разделитель между элементами списка
             friendsLst.addVerticalSeparation()
 
-            loadDataFromSteamToRv()
+            //loadDataFromSteamToRv()
+
+
+            scope.launch { LoadDataInRV() }
+
+
+
 
             friendsLst.adapter = adapter
 
         }
     }
 
-    private fun loadDataFromSteamToRv(
-           onRefreshFinished: () -> Unit = {}
-    ) {
+    private suspend fun LoadDataInRV(onRefreshFinished: () -> Unit = {}) {
+
+        val steamidStrLst = mutableListOf<String>()
+        val playerInfoLst = mutableListOf<InputItem.PlayerInfo>()
+        scope.launch {
+
+            val lstOfFriends = getRetrofitData()
+
+            if (lstOfFriends != null) {
+                (lstOfFriends.friendsList.friends).forEach {
+                    steamidStrLst.add(it.steamid)
+                }
+            }
+
+
+
+            steamidStrLst.forEach {
+                val playersResp = getRetrofitData2(it)
+                if (playersResp != null) {
+                    playerInfoLst.add(playersResp.response.players[0])
+
+                    if (errorMsg == null) {
+
+                        val prevItems = adapter.currentList
+                        val newItems = playerInfoLst.map { it }.minus(prevItems)
+                        withContext(Dispatchers.Main) {
+                            adapter.submitList(prevItems + newItems)
+                        }
+
+                    } else {
+
+                        val prevItems = adapter.currentList
+                        withContext(Dispatchers.Main) {
+                            adapter.submitList(
+                                prevItems.minus(InputItem.ErrorElement) + InputItem.ErrorElement
+                            )
+
+                        }
+
+
+                    }
+                }
+            }
+        }
+        onRefreshFinished()
+    }
+
+    private suspend fun getRetrofitData(): FriendList? {
 
         val retrofit = Retrofit.Builder()
             .baseUrl(STEAM_BASE_URL)
@@ -110,124 +167,34 @@ class FriendsFragment : Fragment() {
             MY_STEAM_ID,
             RELATIONSHIP
         )
-
-        getFriendsToRv(
-            steamApi,
-        ) { onRefreshFinished() }
+        return getFriendsIdsRequest
     }
+
+    private suspend fun getRetrofitData2(friendId: String): PlayersResponse? {
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(STEAM_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val steamApi = retrofit.create<SteamApi>()
+
+        getUserProfileRequest = steamApi.getUser(STEAM_API_KEY, friendId)
+        return getUserProfileRequest
+    }
+
+
 
     override fun onDestroyView() {
 
         super.onDestroyView()
         _binding = null
-        getFriendsIdsRequest?.cancel()
-        getUserProfileRequest?.cancel()
+        //getFriendsIdsRequest?.cancel()
+        //getUserProfileRequest?.cancel()
 
     }
 
-    private fun getFriendsToRv(
-        steamApi: SteamApi,
-        onRefreshFinished: () -> Unit = {}
-    ) {
 
-        getFriendsIdsRequest?.enqueue(object : Callback<FriendList> {
-
-            override fun onResponse(call: Call<FriendList>, response: Response<FriendList>) {
-                val steamidStrLst = mutableListOf<String>()
-
-                if (response.isSuccessful) {
-
-                    val friendLst = response.body() ?: run {
-                        handleError("Null Response")
-                        return
-                    }
-
-                    (friendLst.friendsList.friends).forEach {
-                        steamidStrLst.add(it.steamid)
-                    }
-
-                    steamidStrLst.forEach {it ->
-                        getUserProfileRequest = steamApi.getUser(STEAM_API_KEY, it)
-                        getFriendsInfoToRv()
-                    }
-
-                    onRefreshFinished()
-
-                } else {
-
-                    handleError(response.errorBody().toString())
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<FriendList>, t: Throwable) {
-
-                if (!call.isCanceled) {
-
-                    handleError(t.toString())
-
-                }
-
-            }
-        })
-
-    }
-
-    //работаем со списком друзей, кидаем новых в адаптер, добавляем эл-т загрузки либо ошибку
-    private fun getFriendsInfoToRv() {
-
-        getUserProfileRequest?.enqueue(object : Callback<PlayersResponse> {
-
-            override fun onResponse(
-                call: Call<PlayersResponse>,
-                response: Response<PlayersResponse>
-            ) {
-
-                if (response.isSuccessful) {
-
-                    val playersResp = response.body() ?: run {
-                        handleError("Null Response")
-                        return
-                    }
-
-                    //стим возвращает список из одного пользователя, по этому и [0]
-                    playerInformationLst.add(playersResp.response.players[0])
-
-                    if (errorMsg == null) {
-
-                        val prevItems = adapter.currentList
-                        val newItems = playerInformationLst.map { it }.minus(prevItems)
-
-                        adapter.submitList(prevItems + newItems)
-
-                    } else {
-
-                        val prevItems = adapter.currentList
-
-                        adapter.submitList(
-                            prevItems.minus(InputItem.ErrorElement) + InputItem.ErrorElement
-                        )
-
-                    }
-
-
-                } else {
-
-                    handleError(response.errorBody().toString())
-
-                }
-            }
-
-            override fun onFailure(call: Call<PlayersResponse>, t: Throwable) {
-
-                if (!call.isCanceled) {
-                    handleError(t.toString())
-                }
-
-            }
-        })
-    }
 
     fun handleError(errorStr: String) {
 

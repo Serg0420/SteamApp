@@ -14,8 +14,6 @@ sealed class InputItem {
         val personaState: String
     ) : InputItem()
 
-    object LoadingElement : InputItem()
-
     object ErrorElement : InputItem()
 }
 

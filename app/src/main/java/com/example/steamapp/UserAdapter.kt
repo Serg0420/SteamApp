@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.steamapp.databinding.ErrorElemBinding
-import com.example.steamapp.databinding.LoadingUserBinding
 import com.example.steamapp.databinding.UserLstElemBinding
 
 class UserViewHolder(
@@ -28,10 +27,6 @@ class UserViewHolder(
     }
 
 }
-
-class LoadingUserViewHolder(
-    private val binding: LoadingUserBinding
-) : RecyclerView.ViewHolder(binding.root) {}
 
 class ErrorViewHolder(
     binding: ErrorElemBinding,
@@ -56,7 +51,6 @@ class UserAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is InputItem.PlayerInfo -> USER_ELEMENT
-            InputItem.LoadingElement -> LOADING_ELEMENT
             InputItem.ErrorElement -> ERROR_ELEMENT
         }
     }
@@ -67,9 +61,6 @@ class UserAdapter(
             USER_ELEMENT -> UserViewHolder(
                 binding = UserLstElemBinding.inflate(layoutInflater, parent, false),
                 onUserElemClicked = onUserElemClicked
-            )
-            LOADING_ELEMENT -> LoadingUserViewHolder(
-                binding = LoadingUserBinding.inflate(layoutInflater, parent, false)
             )
             ERROR_ELEMENT -> ErrorViewHolder(
                 binding = ErrorElemBinding.inflate(layoutInflater, parent, false),
@@ -87,20 +78,16 @@ class UserAdapter(
 
         val item = getItem(position)
 
-        when (holder) {
-
-            is UserViewHolder -> {
-                if (item !is InputItem.PlayerInfo) return
-                holder.bind(item)
-            }
+        if (holder is UserViewHolder) {
+            if (item !is InputItem.PlayerInfo) return
+            holder.bind(item)
         }
     }
 
     companion object {
 
         private const val USER_ELEMENT = 0
-        private const val LOADING_ELEMENT = 1
-        private const val ERROR_ELEMENT = 2
+        private const val ERROR_ELEMENT = 1
 
         private val DIFF_UTIL = object : DiffUtil.ItemCallback<InputItem>() {
 

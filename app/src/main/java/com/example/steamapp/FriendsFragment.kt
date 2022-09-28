@@ -9,10 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.steamapp.databinding.FragmentFriendsBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -23,16 +20,19 @@ class FriendsFragment : Fragment() {
     private var getFriendsIdsRequest: FriendList? = null
     private var getUserProfileRequest: PlayersResponse? = null
     private var _binding: FragmentFriendsBinding? = null
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val handler= CoroutineExceptionHandler { _, exception ->
+        handleError(exception.toString())
+    }
+    private val scope = CoroutineScope(Dispatchers.IO+handler+ SupervisorJob())
 
     private val adapter by lazy {
         UserAdapter(
             requireContext(),
-            {
+            onTryAgainBtnClicked={
                 errorMsg = null
-                //loadDataFromSteamToRv()
+                refresh()
             },
-            {
+            onUserElemClicked={
                 findNavController().navigate(
                     /*пока инфы не так много можно и передать как аргументы,
                     потом лучше сделаю в DetailsFragment отдельный запрос,
@@ -76,92 +76,92 @@ class FriendsFragment : Fragment() {
 
             val linearLM = LinearLayoutManager(requireContext())
 
-            swipeRefresh.setOnRefreshListener {
-                //getFriendsIdsRequest?.cancel()
-                //getUserProfileRequest?.cancel()
-                getFriendsIdsRequest = null
-                getUserProfileRequest = null
-                adapter.submitList(mutableListOf<InputItem>())
-                playerInformationLst = mutableListOf()
-                errorMsg = null
-                scope.launch { LoadDataInRV{swipeRefresh.isRefreshing = false} }
-                //загружаем страницу пользователей
-                //loadDataFromSteamToRv { swipeRefresh.isRefreshing = false }
-            }
+            swipeRefresh.setOnRefreshListener { refresh()}
 
             friendsLst.layoutManager = linearLM
             //добавляем разделитель между элементами списка
             friendsLst.addVerticalSeparation()
 
-            //loadDataFromSteamToRv()
-
-
-            scope.launch { LoadDataInRV() }
-
-
-
+            scope.launch { loadDataInRV() }
 
             friendsLst.adapter = adapter
 
         }
     }
 
-    private suspend fun LoadDataInRV(onRefreshFinished: () -> Unit = {}) {
+    private fun refresh(){
+        getFriendsIdsRequest = null
+        getUserProfileRequest = null
+        adapter.submitList(mutableListOf<InputItem>())
+        playerInformationLst = mutableListOf()
+        errorMsg = null
+        scope.launch { loadDataInRV{binding.swipeRefresh.isRefreshing = false} }
+    }
+
+    private suspend fun loadDataInRV(onRefreshFinished: () -> Unit = {}) {
 
         val steamidStrLst = mutableListOf<String>()
         val playerInfoLst = mutableListOf<InputItem.PlayerInfo>()
+
         scope.launch {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(STEAM_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
-            val lstOfFriends = getRetrofitData()
+            val steamApi = retrofit.create<SteamApi>()
 
-            if (lstOfFriends != null) {
-                (lstOfFriends.friendsList.friends).forEach {
-                    steamidStrLst.add(it.steamid)
-                }
-            }
+            val resultFriendListDownload= runCatching {
 
-
-
-            steamidStrLst.forEach {
-                val playersResp = getRetrofitData2(it)
-                if (playersResp != null) {
-                    playerInfoLst.add(playersResp.response.players[0])
-
-                    if (errorMsg == null) {
-
-                        val prevItems = adapter.currentList
-                        val newItems = playerInfoLst.map { it }.minus(prevItems)
-                        withContext(Dispatchers.Main) {
-                            adapter.submitList(prevItems + newItems)
-                        }
-
-                    } else {
-
-                        val prevItems = adapter.currentList
-                        withContext(Dispatchers.Main) {
-                            adapter.submitList(
-                                prevItems.minus(InputItem.ErrorElement) + InputItem.ErrorElement
-                            )
-
-                        }
-
-
+                val lstOfFriends = getUserFriendsIds(steamApi)
+                if (lstOfFriends != null) {
+                    (lstOfFriends.friendsList.friends).forEach {
+                        steamidStrLst.add(it.steamid)
                     }
                 }
             }
+            resultFriendListDownload
+                .onSuccess {
+
+                    val resultInfoDownload= runCatching {
+
+                        steamidStrLst.forEach {
+                            val playersResp = getUserInfoById(it,steamApi)
+                            if (playersResp != null) {
+                                playerInfoLst.add(playersResp.response.players[0])
+                            }
+                        }
+                    }
+                    resultInfoDownload
+                        .onSuccess {
+                            val prevItems = adapter.currentList
+                            val newItems = playerInfoLst.map { it }.minus(prevItems)
+                            withContext(Dispatchers.Main) {
+                                adapter.submitList(prevItems + newItems)
+                            }
+                            onRefreshFinished()
+                        }
+                        .onFailure {
+                            val prevItems = adapter.currentList
+                            withContext(Dispatchers.Main) {
+                                adapter.submitList(
+                                    prevItems
+                                        .minus(InputItem.ErrorElement) + InputItem.ErrorElement
+                                )
+                            }
+                            onRefreshFinished()
+                            handleError("Something went wrong! Can't download friend info")
+                        }
+                }
+                .onFailure {
+                    handleError("Something went wrong! Can't download friends id list")
+                    onRefreshFinished()
+                }
+
         }
-        onRefreshFinished()
     }
 
-    private suspend fun getRetrofitData(): FriendList? {
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(STEAM_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val steamApi = retrofit.create<SteamApi>()
-
+    private suspend fun getUserFriendsIds(steamApi:SteamApi): FriendList? {
         getFriendsIdsRequest = steamApi.getUsersFriends(
             STEAM_API_KEY,
             MY_STEAM_ID,
@@ -170,20 +170,10 @@ class FriendsFragment : Fragment() {
         return getFriendsIdsRequest
     }
 
-    private suspend fun getRetrofitData2(friendId: String): PlayersResponse? {
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(STEAM_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val steamApi = retrofit.create<SteamApi>()
-
+    private suspend fun getUserInfoById(friendId: String, steamApi:SteamApi): PlayersResponse? {
         getUserProfileRequest = steamApi.getUser(STEAM_API_KEY, friendId)
         return getUserProfileRequest
     }
-
-
 
     override fun onDestroyView() {
 
@@ -196,7 +186,7 @@ class FriendsFragment : Fragment() {
 
 
 
-    fun handleError(errorStr: String) {
+    private fun handleError(errorStr: String) {
 
         errorMsg = errorStr
         Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()

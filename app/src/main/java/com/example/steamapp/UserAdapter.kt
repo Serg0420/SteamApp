@@ -56,7 +56,6 @@ class UserAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
         return when (viewType) {
             USER_ELEMENT -> UserViewHolder(
                 binding = UserLstElemBinding.inflate(layoutInflater, parent, false),
@@ -65,17 +64,12 @@ class UserAdapter(
             ERROR_ELEMENT -> ErrorViewHolder(
                 binding = ErrorElemBinding.inflate(layoutInflater, parent, false),
                 onTryAgainBtnClicked = onTryAgainBtnClicked
-
             )
             else -> error("Unknown input view")
-
-
         }
-
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
         val item = getItem(position)
 
         if (holder is UserViewHolder) {
@@ -85,20 +79,15 @@ class UserAdapter(
     }
 
     companion object {
-
         private const val USER_ELEMENT = 0
         private const val ERROR_ELEMENT = 1
 
         private val DIFF_UTIL = object : DiffUtil.ItemCallback<InputItem>() {
-
             override fun areItemsTheSame(oldItem: InputItem, newItem: InputItem): Boolean {
-
                 return oldItem == newItem
             }
 
             override fun areContentsTheSame(oldItem: InputItem, newItem: InputItem): Boolean {
-
-                //уточни тут усли будет много данных
                 return oldItem == newItem
             }
         }

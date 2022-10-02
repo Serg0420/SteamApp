@@ -38,7 +38,7 @@ class DetailsFragment : Fragment() {
             nameTxtv.append(args.personaName)
             idTxtv.append(args.steamid)
 
-            val status = args.getStatus()
+            val status = args.getStatus(requireContext())
 
             statusTxtv.append(status)
 
@@ -52,7 +52,4 @@ class DetailsFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-
-
 }

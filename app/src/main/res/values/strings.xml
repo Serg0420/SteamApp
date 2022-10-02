@@ -5,4 +5,11 @@
     <string name="status">Status:</string>
     <string name="error">Error</string>
     <string name="try_again">Try again</string>
+    <string name="online">Online</string>
+    <string name="busy">Busy</string>
+    <string name="away">Away</string>
+    <string name="snooze">Snooze</string>
+    <string name="lookingToTrade">looking to trade</string>
+    <string name="lookingToPlay">looking to play</string>
+    <string name="offline">Offline</string>
 </resources>

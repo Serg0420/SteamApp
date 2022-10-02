@@ -1,39 +1,27 @@
 package com.example.steamapp
 
-
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
 fun RecyclerView.addVerticalSeparation() {
-
     this.addItemDecoration(
-
         MaterialDividerItemDecoration(
             this.context,
             MaterialDividerItemDecoration.VERTICAL
         )
-
     )
 }
 
-fun DetailsFragmentArgs.getStatus(): String {
+fun DetailsFragmentArgs.getStatus(context: Context): String {
     return when (this.personaState.toInt()) {
         //сетевые статусы игрока
-        1 -> ONLINE
-        2 -> BUSY
-        3 -> AWAY
-        4 -> SNOOZE
-        5 -> LOOKING_TO_TRADE
-        6 -> LOOKING_TO_PLAY
-        else -> OFFLINE
+        1 -> context.getString(R.string.online)
+        2 -> context.getString(R.string.busy)
+        3 -> context.getString(R.string.away)
+        4 -> context.getString(R.string.snooze)
+        5 -> context.getString(R.string.lookingToTrade)
+        6 -> context.getString(R.string.lookingToPlay)
+        else -> context.getString(R.string.offline)
     }
 }
-
-private const val ONLINE = "Online"
-private const val BUSY = "Busy"
-private const val AWAY = "Away"
-private const val SNOOZE = "Snooze"
-private const val LOOKING_TO_TRADE = "looking to trade"
-private const val LOOKING_TO_PLAY = "looking to play"
-private const val OFFLINE = "Offline"

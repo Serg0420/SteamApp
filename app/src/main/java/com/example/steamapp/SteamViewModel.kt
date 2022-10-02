@@ -5,24 +5,43 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import okhttp3.internal.notifyAll
 
 class SteamViewModel(
     private val retroDataSource: RetrofitDataSource
 ) : ViewModel() {
 
-    private val scope = CoroutineScope(Dispatchers.IO+ SupervisorJob())
-    private val _dataFlow = MutableStateFlow(emptyList<InputItem>())
-    val dataFlow: Flow<List<InputItem>> = _dataFlow.asStateFlow()
+    private val refreshedFlow = MutableSharedFlow<Unit>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
-    init {
-        viewModelScope.launch {
-            val deferred=scope.async {
-                retroDataSource.loadDataInRV()
-            }
-            scope.launch {
-                val d=deferred.await()
-                _dataFlow.value =d
-            }
+    private val _dataFlow = flow {
+        emit(runCatch())
+    }.shareIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        replay = 1
+    )
+
+    val dataFlow = combine(
+        _dataFlow,
+        refreshedFlow
+            .onStart { emit((Unit)) }
+            .map { runCatch() }
+    ) { _, refreshedfl -> refreshedfl }
+
+    fun onRefreshed() {
+        refreshedFlow.tryEmit(Unit)
+    }
+
+    private suspend fun runCatch(): LCE<List<InputItem.PlayerInfo>> {
+        return runCatching {
+            retroDataSource.loadData()
         }
+            .fold(
+                onSuccess = { LCE.Content(it) },
+                onFailure = { LCE.Error(it) }
+            )
     }
 }

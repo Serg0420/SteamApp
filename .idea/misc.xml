@@ -5,10 +5,12 @@
       <map>
         <entry key="..\:/SteamApp/app/src/main/res/layout/activity_main.xml" value="0.328125" />
         <entry key="..\:/SteamApp/app/src/main/res/layout/error_elem.xml" value="0.26145833333333335" />
+        <entry key="..\:/SteamApp/app/src/main/res/layout/fragment_bottom_navigation.xml" value="0.36666666666666664" />
         <entry key="..\:/SteamApp/app/src/main/res/layout/fragment_details.xml" value="0.328125" />
         <entry key="..\:/SteamApp/app/src/main/res/layout/fragment_friends.xml" value="0.328125" />
         <entry key="..\:/SteamApp/app/src/main/res/layout/loading_user.xml" value="0.2708333333333333" />
         <entry key="..\:/SteamApp/app/src/main/res/layout/user_lst_elem.xml" value="0.328125" />
+        <entry key="..\:/SteamApp/app/src/main/res/menu/menu_bottom_navigation.xml" value="0.27421875" />
         <entry key="..\:/SteamApp/app/src/main/res/menu/menu_search_toolbar.xml" value="0.365625" />
       </map>
     </option>

@@ -94,7 +94,6 @@ class FriendsFragment : Fragment() {
                         is LCE.Content -> {
                             adapter.submitList(lce.data)
                             progressIndicator.isVisible = false
-                            swipeRefresh.isRefreshing = false
                         }
                     }
                 }

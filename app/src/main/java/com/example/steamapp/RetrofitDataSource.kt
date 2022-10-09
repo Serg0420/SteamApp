@@ -5,48 +5,41 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
 class RetrofitDataSource {
-    private var getFriendsIdsRequest: FriendList? = null
-    private var getUserProfileRequest: PlayersResponse? = null
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(STEAM_BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val steamApi = retrofit.create<SteamApi>()
 
     suspend fun loadData(): List<InputItem.PlayerInfo> {
         val steamidStrLst = mutableListOf<String>()
         val playerInfoLst = mutableListOf<InputItem.PlayerInfo>()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(STEAM_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val lstOfFriends = getUserFriendsIds()
 
-        val steamApi = retrofit.create<SteamApi>()
-
-        val lstOfFriends = getUserFriendsIds(steamApi)
-        if (lstOfFriends != null) {
-            (lstOfFriends.friendsList.friends).forEach {
-                steamidStrLst.add(it.steamid)
-            }
-        }
+        steamidStrLst.addAll(
+            lstOfFriends.friendsList.friends.map { it.steamid }
+        )
 
         steamidStrLst.forEach {
-            val playersResp = getUserInfoById(it, steamApi)
-            if (playersResp != null) {
-                playerInfoLst.add(playersResp.response.players[0])
-            }
+            val playersResp = getUserInfoById(it)
+            playerInfoLst.add(playersResp.response.players[0])
         }
         return playerInfoLst
     }
 
-    private suspend fun getUserFriendsIds(steamApi: SteamApi): FriendList? {
-        getFriendsIdsRequest = steamApi.getUsersFriends(
+    private suspend fun getUserFriendsIds(): FriendList {
+        return steamApi.getUsersFriends(
             STEAM_API_KEY,
             MY_STEAM_ID,
             RELATIONSHIP
         )
-        return getFriendsIdsRequest
     }
 
-    private suspend fun getUserInfoById(friendId: String, steamApi: SteamApi): PlayersResponse? {
-        getUserProfileRequest = steamApi.getUser(STEAM_API_KEY, friendId)
-        return getUserProfileRequest
+    private suspend fun getUserInfoById(friendId: String): PlayersResponse {
+        return steamApi.getUser(STEAM_API_KEY, friendId)
     }
 
     companion object {

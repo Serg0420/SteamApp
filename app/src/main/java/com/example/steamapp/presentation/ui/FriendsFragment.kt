@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +15,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.steamapp.*
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -37,10 +39,10 @@ class FriendsFragment : Fragment() {
         )
     }
 
-    private val viewModel by viewModels<SteamViewModel> {
+    private val viewModel by viewModels<FriendsViewModel> {
         viewModelFactory {
             initializer {
-                SteamViewModel(
+                FriendsViewModel(
                     retroDataSource = ServiceLocator.provideDataSource()
                 )
             }

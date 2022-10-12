@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.steamapp.R
 import com.example.steamapp.databinding.FragmentBottomNavigationBinding
 
 class BottomNavigationFragment : Fragment() {

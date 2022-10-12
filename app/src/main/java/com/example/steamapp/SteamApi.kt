@@ -10,11 +10,11 @@ interface SteamApi {
         @Query("key") key: String,
         @Query("steamid") steamid: Long,
         @Query("relationship") relationship: String
-    ): FriendList
+    ): UsersFriendsResponseDTO
 
     @GET("ISteamUser/GetPlayerSummaries/v0002/")
     suspend fun getUser(
         @Query("key") key: String,
         @Query("steamids") steamids: String
-    ): PlayersResponse
+    ): UserInfoResponseDTO
 }

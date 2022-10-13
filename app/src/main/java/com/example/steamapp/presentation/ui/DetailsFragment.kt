@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.example.steamapp.databinding.FragmentDetailsBinding
-import com.example.steamapp.getStatus
 
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null

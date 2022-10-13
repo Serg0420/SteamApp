@@ -2,8 +2,8 @@ package com.example.steamapp.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.steamapp.InputItem
 import com.example.steamapp.RetrofitDataSource
+import com.example.steamapp.UsersInfo
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -36,7 +36,7 @@ class FriendsViewModel(
         refreshedFlow.tryEmit(Unit)
     }
 
-    private suspend fun runCatch(): LCE<List<InputItem.PlayerInfo>> {
+    private suspend fun runCatch(): LCE<List<UsersInfo>> {
         return runCatching {
             retroDataSource.loadData()
         }

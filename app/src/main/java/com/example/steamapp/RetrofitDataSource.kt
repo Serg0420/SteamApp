@@ -13,24 +13,24 @@ class RetrofitDataSource {
 
     private val steamApi = retrofit.create<SteamApi>()
 
-    suspend fun loadData(): List<InputItem.PlayerInfo> {
+    suspend fun loadData(): List<UsersInfo> {
         val steamidStrLst = mutableListOf<String>()
-        val playerInfoLst = mutableListOf<InputItem.PlayerInfo>()
+        val playerInfoLst = mutableListOf<UsersInfo>()
 
         val lstOfFriends = getUserFriendsIds()
 
         steamidStrLst.addAll(
-            lstOfFriends.friendList.friendsList.friends.map { it.steamid }
+            lstOfFriends.friendsList.friends.map { it.steamid }
         )
 
         steamidStrLst.forEach {
             val playersResp = getUserInfoById(it)
-            playerInfoLst.add(playersResp.user.response.players[0])
+            playerInfoLst.add(playersResp.toDomain())
         }
         return playerInfoLst
     }
 
-    private suspend fun getUserFriendsIds(): UsersFriendsResponseDTO {
+    private suspend fun getUserFriendsIds(): FriendList {
         return steamApi.getUsersFriends(
             STEAM_API_KEY,
             MY_STEAM_ID,
@@ -38,7 +38,7 @@ class RetrofitDataSource {
         )
     }
 
-    private suspend fun getUserInfoById(friendId: String): UserInfoResponseDTO {
+    private suspend fun getUserInfoById(friendId: String): PlayersResponse {
         return steamApi.getUser(STEAM_API_KEY, friendId)
     }
 

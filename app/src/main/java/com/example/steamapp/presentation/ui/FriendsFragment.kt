@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +19,8 @@ import com.example.steamapp.databinding.FragmentFriendsBinding
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class FriendsFragment : Fragment() {
 
@@ -28,25 +29,19 @@ class FriendsFragment : Fragment() {
     private val adapter by lazy {
         UserAdapter(
             requireContext(),
-            onTryAgainBtnClicked = { refresh() },
+            //onTryAgainBtnClicked = { refresh() },
             onUserElemClicked = {
                 findNavController().navigate(
                     FriendsFragmentDirections.toFragmentDetails(
-                        it.personaName, it.avatarFull, it.steamid, it.personaState
+                        it.nickName, it.avatar, it.steamId, it.state
                     )
                 )
             }
         )
     }
 
-    private val viewModel by viewModels<FriendsViewModel> {
-        viewModelFactory {
-            initializer {
-                FriendsViewModel(
-                    retroDataSource = ServiceLocator.provideDataSource()
-                )
-            }
-        }
+    private val viewModel by inject<FriendsViewModel> {
+        parametersOf(ServiceLocator.provideDataSource())
     }
 
     private val binding
@@ -88,9 +83,7 @@ class FriendsFragment : Fragment() {
                 .onEach { lce ->
                     when (lce) {
                         is LCE.Error -> {
-                            adapter.submitList(
-                                adapter.currentList + InputItem.ErrorElement
-                            )
+
                             handleError(lce.throwable.toString())
                         }
                         is LCE.Content -> {

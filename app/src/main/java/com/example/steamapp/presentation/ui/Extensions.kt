@@ -1,7 +1,8 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import com.example.steamapp.R
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
 fun RecyclerView.addVerticalSeparation() {

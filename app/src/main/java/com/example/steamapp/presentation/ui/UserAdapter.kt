@@ -25,7 +25,6 @@ class UserViewHolder(
             }
         }
     }
-
 }
 
 class UserAdapter(
@@ -37,10 +36,9 @@ class UserAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return UserViewHolder(
-                binding = UserLstElemBinding.inflate(layoutInflater, parent, false),
-                onUserElemClicked = onUserElemClicked
-            )
-
+            binding = UserLstElemBinding.inflate(layoutInflater, parent, false),
+            onUserElemClicked = onUserElemClicked
+        )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

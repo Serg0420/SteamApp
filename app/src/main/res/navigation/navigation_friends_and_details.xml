@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_friends"
-        android:name="com.example.steamapp.presentation.ui.fragment.FriendsFragment"
+        android:name="com.example.steamapp.presentation.ui.fragments.FriendsFragment"
         tools:layout="@layout/fragment_friends">
 
         <action
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/fragment_details"
-        android:name="com.example.steamapp.presentation.ui.fragment.DetailsFragment"
+        android:name="com.example.steamapp.presentation.ui.fragments.DetailsFragment"
         tools:layout="@layout/fragment_details">
 
         <argument

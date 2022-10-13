@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_my_profile"
-        android:name="com.example.steamapp.presentation.ui.fragment.MyProfileFragment"
+        android:name="com.example.steamapp.presentation.ui.fragments.MyProfileFragment"
         tools:layout="@layout/fragment_my_profile">
     </fragment>
 </navigation>

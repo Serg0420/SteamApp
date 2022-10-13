@@ -2,14 +2,14 @@ package com.example.steamapp.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.steamapp.data.repository.UsersInfoRepositoryImpl
 import com.example.steamapp.domain.model.UsersInfo
+import com.example.steamapp.domain.repository.UserInfoRepository
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 class FriendsViewModel(
-    private val retroDataSource: UsersInfoRepositoryImpl
+    private val retroDataSource: UserInfoRepository
 ) : ViewModel() {
 
     private val refreshedFlow = MutableSharedFlow<Unit>(

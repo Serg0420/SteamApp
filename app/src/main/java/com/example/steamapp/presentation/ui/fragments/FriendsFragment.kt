@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui.fragment
+package com.example.steamapp.presentation.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -79,8 +79,8 @@ class FriendsFragment : Fragment() {
                 .onEach { lce ->
                     when (lce) {
                         is LCE.Error -> {
-                            tryAgainBtn.setOnClickListener{refresh()}
-                            tryAgainBtn.isVisible=true
+                            tryAgainBtn.setOnClickListener { refresh() }
+                            tryAgainBtn.isVisible = true
                             progressIndicator.isVisible = true
                             handleError(lce.throwable.toString())
                         }
@@ -105,9 +105,8 @@ class FriendsFragment : Fragment() {
 
     private fun refresh() {
         adapter.submitList(emptyList())
-        binding.tryAgainBtn.isVisible=false
+        binding.tryAgainBtn.isVisible = false
         binding.progressIndicator.isVisible = false
         viewModel.onRefreshed()
     }
-
 }

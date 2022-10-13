@@ -2,8 +2,8 @@ package com.example.steamapp.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.steamapp.RetrofitDataSource
-import com.example.steamapp.UsersInfo
+import com.example.steamapp.data.RetrofitDataSource
+import com.example.steamapp.domain.UsersInfo
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*

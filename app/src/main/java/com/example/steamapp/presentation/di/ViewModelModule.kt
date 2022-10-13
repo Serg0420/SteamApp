@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.di
 
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module

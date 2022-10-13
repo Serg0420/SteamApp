@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.domain
 
 data class UsersInfo(
     val nickName: String,

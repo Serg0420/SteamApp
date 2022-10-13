@@ -10,12 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.steamapp.*
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import com.example.steamapp.domain.ServiceLocator
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,7 +27,6 @@ class FriendsFragment : Fragment() {
     private val adapter by lazy {
         UserAdapter(
             requireContext(),
-            //onTryAgainBtnClicked = { refresh() },
             onUserElemClicked = {
                 findNavController().navigate(
                     FriendsFragmentDirections.toFragmentDetails(
@@ -83,7 +80,9 @@ class FriendsFragment : Fragment() {
                 .onEach { lce ->
                     when (lce) {
                         is LCE.Error -> {
-
+                            tryAgainBtn.setOnClickListener{refresh()}
+                            tryAgainBtn.isVisible=true
+                            progressIndicator.isVisible = true
                             handleError(lce.throwable.toString())
                         }
                         is LCE.Content -> {
@@ -107,6 +106,8 @@ class FriendsFragment : Fragment() {
 
     private fun refresh() {
         adapter.submitList(emptyList())
+        binding.tryAgainBtn.isVisible=false
+        binding.progressIndicator.isVisible = false
         viewModel.onRefreshed()
     }
 

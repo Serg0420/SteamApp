@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.data
 
 import retrofit2.http.GET
 import retrofit2.http.Query

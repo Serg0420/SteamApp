@@ -1,5 +1,7 @@
-package com.example.steamapp
+package com.example.steamapp.data
 
+import com.example.steamapp.domain.UsersFriend
+import com.example.steamapp.domain.UsersInfo
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
@@ -20,26 +22,26 @@ class RetrofitDataSource {
         val lstOfFriends = getUserFriendsIds()
 
         steamidStrLst.addAll(
-            lstOfFriends.friendsList.friends.map { it.steamid }
+            lstOfFriends.map { it.steamId }
         )
 
         steamidStrLst.forEach {
             val playersResp = getUserInfoById(it)
-            playerInfoLst.add(playersResp.toDomain())
+            playerInfoLst.add(playersResp)
         }
         return playerInfoLst
     }
 
-    private suspend fun getUserFriendsIds(): FriendList {
+    private suspend fun getUserFriendsIds(): List<UsersFriend> {
         return steamApi.getUsersFriends(
             STEAM_API_KEY,
             MY_STEAM_ID,
             RELATIONSHIP
-        )
+        ).toDomain()
     }
 
-    private suspend fun getUserInfoById(friendId: String): PlayersResponse {
-        return steamApi.getUser(STEAM_API_KEY, friendId)
+    private suspend fun getUserInfoById(friendId: String): UsersInfo {
+        return steamApi.getUser(STEAM_API_KEY, friendId).toDomain()
     }
 
     companion object {

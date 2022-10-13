@@ -10,7 +10,7 @@ import androidx.navigation.fragment.navArgs
 import coil.load
 import com.example.steamapp.databinding.FragmentDetailsBinding
 
-class FragmentDetails : Fragment() {
+class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding
         get() = requireNotNull(_binding) { "View was destroyed" }
@@ -29,30 +29,18 @@ class FragmentDetails : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         super.onViewCreated(view, savedInstanceState)
 
-        val args: FragmentDetailsArgs by navArgs()
-        val status: String
+        val args: DetailsFragmentArgs by navArgs()
 
         with(binding) {
             avatarImgv.load(args.avatarFull)
             nameTxtv.append(args.personaName)
             idTxtv.append(args.steamid)
 
-            status = when (args.personaState.toInt()) {
-                //сетевые статусы игрока
-                1 -> ONLINE
-                2 -> BUSY
-                3 -> AWAY
-                4 -> SNOOZE
-                5 -> LOOKING_TO_TRADE
-                6 -> LOOKING_TO_PLAY
-                else -> OFFLINE
-            }
+            val status = args.getStatus(requireContext())
 
             statusTxtv.append(status)
-
 
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
@@ -63,16 +51,5 @@ class FragmentDetails : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-
-        private const val ONLINE = "Online"
-        private const val BUSY = "Busy"
-        private const val AWAY = "Away"
-        private const val SNOOZE = "Snooze"
-        private const val LOOKING_TO_TRADE = "looking to trade"
-        private const val LOOKING_TO_PLAY = "looking to play"
-        private const val OFFLINE = "Offline"
     }
 }

@@ -2,14 +2,14 @@ package com.example.steamapp.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.steamapp.data.RetrofitDataSource
-import com.example.steamapp.domain.UsersInfo
+import com.example.steamapp.data.repository.UsersInfoRepositoryImpl
+import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 class FriendsViewModel(
-    private val retroDataSource: RetrofitDataSource
+    private val retroDataSource: UsersInfoRepositoryImpl
 ) : ViewModel() {
 
     private val refreshedFlow = MutableSharedFlow<Unit>(
@@ -38,7 +38,7 @@ class FriendsViewModel(
 
     private suspend fun runCatch(): LCE<List<UsersInfo>> {
         return runCatching {
-            retroDataSource.loadData()
+            retroDataSource.getUsersInfoLst()
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

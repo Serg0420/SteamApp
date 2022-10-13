@@ -1,4 +1,4 @@
-package com.example.steamapp.domain
+package com.example.steamapp.domain.model
 
 data class UsersFriend(
     val steamId: String,

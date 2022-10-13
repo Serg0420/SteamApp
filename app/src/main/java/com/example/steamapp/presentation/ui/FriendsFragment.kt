@@ -13,12 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.steamapp.databinding.FragmentFriendsBinding
-import com.example.steamapp.domain.ServiceLocator
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 class FriendsFragment : Fragment() {
 
@@ -37,9 +35,7 @@ class FriendsFragment : Fragment() {
         )
     }
 
-    private val viewModel by inject<FriendsViewModel> {
-        parametersOf(ServiceLocator.provideDataSource())
-    }
+    private val viewModel by inject<FriendsViewModel>()
 
     private val binding
         get() = requireNotNull(_binding) {

@@ -1,21 +1,13 @@
-package com.example.steamapp.data
+package com.example.steamapp.data.repository
 
-import com.example.steamapp.domain.UsersFriend
-import com.example.steamapp.domain.UsersInfo
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
+import com.example.steamapp.data.api.SteamApi
+import com.example.steamapp.data.mapper.toDomain
+import com.example.steamapp.domain.model.UsersFriend
+import com.example.steamapp.domain.model.UsersInfo
+import com.example.steamapp.domain.repository.UserInfoRepository
 
-class RetrofitDataSource {
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(STEAM_BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val steamApi = retrofit.create<SteamApi>()
-
-    suspend fun loadData(): List<UsersInfo> {
+class UsersInfoRepositoryImpl(private val steamApi: SteamApi):UserInfoRepository {
+    override suspend fun getUsersInfoLst(): List<UsersInfo> {
         val steamidStrLst = mutableListOf<String>()
         val playerInfoLst = mutableListOf<UsersInfo>()
 
@@ -45,10 +37,9 @@ class RetrofitDataSource {
     }
 
     companion object {
-        /*ссылка на кореь апи и ключ, его стим даёт бесплатно, но только зареганым
+        /*апи ключ, его стим даёт бесплатно, но только зареганым
         юзерам с активированным аккаунтом
         */
-        private const val STEAM_BASE_URL = " http://api.steampowered.com/"
         private const val STEAM_API_KEY = "EA8CD62FA7C21007003DEF64FF96E20C"
 
         //это мой стим ID, соотвественно и друзей выводит именно моих

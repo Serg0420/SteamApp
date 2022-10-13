@@ -1,4 +1,4 @@
-package com.example.steamapp.data
+package com.example.steamapp.data.model
 
 import com.google.gson.annotations.SerializedName
 

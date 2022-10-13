@@ -1,7 +1,9 @@
-package com.example.steamapp.data
+package com.example.steamapp.data.mapper
 
-import com.example.steamapp.domain.UsersFriend
-import com.example.steamapp.domain.UsersInfo
+import com.example.steamapp.data.model.FriendList
+import com.example.steamapp.data.model.PlayersResponse
+import com.example.steamapp.domain.model.UsersFriend
+import com.example.steamapp.domain.model.UsersInfo
 
 fun PlayersResponse.toDomain(): UsersInfo {
     return UsersInfo(

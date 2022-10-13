@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.example.steamapp.domain.UsersInfo
+import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.databinding.UserLstElemBinding
 
 class UserViewHolder(

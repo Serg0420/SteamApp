@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.steamapp.databinding.FragmentFriendsBinding
 import com.example.steamapp.presentation.model.LCE
+import com.example.steamapp.presentation.ui.FriendsViewModel
+import com.example.steamapp.presentation.ui.UserAdapter
+import com.example.steamapp.presentation.ui.addVerticalSeparation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject

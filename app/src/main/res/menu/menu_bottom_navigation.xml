@@ -3,5 +3,10 @@
     <item
         android:id="@+id/navigation_friends_and_details"
         android:icon="@android:drawable/btn_star_big_on"
-        android:title="Friends" />
+        android:title="@string/friends" />
+
+    <item
+        android:id="@+id/navigation_fragment_my_profile"
+        android:icon="@drawable/ic_account_circle"
+        android:title="@string/my_profile" />
 </menu>

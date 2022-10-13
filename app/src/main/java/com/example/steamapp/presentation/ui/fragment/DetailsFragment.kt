@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.example.steamapp.databinding.FragmentDetailsBinding
+import com.example.steamapp.presentation.ui.getStatus
 
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null

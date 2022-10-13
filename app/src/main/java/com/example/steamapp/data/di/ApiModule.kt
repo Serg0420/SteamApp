@@ -7,10 +7,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
+private const val BASE_STEAM_API_URL = "http://api.steampowered.com/"
+
 val apiModule = module {
     single {
         Retrofit.Builder()
-            .baseUrl("http://api.steampowered.com/")
+            .baseUrl(BASE_STEAM_API_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

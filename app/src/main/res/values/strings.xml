@@ -12,4 +12,6 @@
     <string name="lookingToTrade">looking to trade</string>
     <string name="lookingToPlay">looking to play</string>
     <string name="offline">Offline</string>
+    <string name="friends">Friends</string>
+    <string name="my_profile">My Profile</string>
 </resources>

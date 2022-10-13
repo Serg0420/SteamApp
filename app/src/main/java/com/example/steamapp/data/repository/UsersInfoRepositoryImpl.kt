@@ -32,8 +32,8 @@ class UsersInfoRepositoryImpl(private val steamApi: SteamApi):UserInfoRepository
         ).toDomain()
     }
 
-    private suspend fun getUserInfoById(friendId: String): UsersInfo {
-        return steamApi.getUser(STEAM_API_KEY, friendId).toDomain()
+    override suspend fun getUserInfoById(userId: String): UsersInfo {
+        return steamApi.getUser(STEAM_API_KEY, userId).toDomain()
     }
 
     companion object {

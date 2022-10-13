@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/app_name" />
+
+    <ImageView
+        android:id="@+id/avatar_imgv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="16dp"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/id_txtv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/id"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/name_txtv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/name"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/status_txtv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/status"
+        android:textSize="25sp" />
+
+</LinearLayout>

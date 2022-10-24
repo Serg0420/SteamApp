@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.model
 
 sealed class LCE<out T> {
     data class Content<T>(val data: T) : LCE<T>()

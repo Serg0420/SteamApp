@@ -1,5 +1,7 @@
-package com.example.steamapp
+package com.example.steamapp.data.api
 
+import com.example.steamapp.data.model.FriendList
+import com.example.steamapp.data.model.PlayersResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

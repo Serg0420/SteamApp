@@ -1,7 +1,10 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import com.example.steamapp.R
+import com.example.steamapp.domain.model.UsersInfo
+import com.example.steamapp.presentation.ui.fragments.DetailsFragmentArgs
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
 fun RecyclerView.addVerticalSeparation() {
@@ -13,8 +16,17 @@ fun RecyclerView.addVerticalSeparation() {
     )
 }
 
-fun DetailsFragmentArgs.getStatus(context: Context): String {
-    return when (this.personaState.toInt()) {
+fun DetailsFragmentArgs.getUser(): UsersInfo {
+    return UsersInfo(
+        avatar = this.avatarFull,
+        nickName = this.personaName,
+        steamId = this.steamid,
+        state = this.personaState
+    )
+}
+
+fun UsersInfo.getStatus(context: Context): String {
+    return when (this.state.toInt()) {
         //сетевые статусы игрока
         1 -> context.getString(R.string.online)
         2 -> context.getString(R.string.busy)

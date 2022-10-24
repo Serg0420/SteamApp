@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.example.steamapp.databinding.FragmentDetailsBinding
+import com.example.steamapp.presentation.ui.getStatus
+import com.example.steamapp.presentation.ui.getUser
 
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
@@ -32,13 +34,14 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val args: DetailsFragmentArgs by navArgs()
+        val user = args.getUser()
 
         with(binding) {
-            avatarImgv.load(args.avatarFull)
-            nameTxtv.append(args.personaName)
-            idTxtv.append(args.steamid)
+            avatarImgv.load(user.avatar)
+            nameTxtv.append(user.nickName)
+            idTxtv.append(user.steamId)
 
-            val status = args.getStatus(requireContext())
+            val status = user.getStatus(requireContext())
 
             statusTxtv.append(status)
 

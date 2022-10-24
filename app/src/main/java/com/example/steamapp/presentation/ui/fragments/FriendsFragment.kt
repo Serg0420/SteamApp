@@ -1,4 +1,4 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,17 +7,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import com.example.steamapp.presentation.model.LCE
+import com.example.steamapp.presentation.ui.FriendsViewModel
+import com.example.steamapp.presentation.ui.UserAdapter
+import com.example.steamapp.presentation.ui.addVerticalSeparation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.inject
 
 class FriendsFragment : Fragment() {
 
@@ -26,26 +28,17 @@ class FriendsFragment : Fragment() {
     private val adapter by lazy {
         UserAdapter(
             requireContext(),
-            onTryAgainBtnClicked = { refresh() },
             onUserElemClicked = {
                 findNavController().navigate(
                     FriendsFragmentDirections.toFragmentDetails(
-                        it.personaName, it.avatarFull, it.steamid, it.personaState
+                        it.nickName, it.avatar, it.steamId, it.state
                     )
                 )
             }
         )
     }
 
-    private val viewModel by viewModels<SteamViewModel> {
-        viewModelFactory {
-            initializer {
-                SteamViewModel(
-                    retroDataSource = ServiceLocator.provideDataSource()
-                )
-            }
-        }
-    }
+    private val viewModel by inject<FriendsViewModel>()
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -86,15 +79,14 @@ class FriendsFragment : Fragment() {
                 .onEach { lce ->
                     when (lce) {
                         is LCE.Error -> {
-                            adapter.submitList(
-                                adapter.currentList + InputItem.ErrorElement
-                            )
+                            tryAgainBtn.setOnClickListener { refresh() }
+                            tryAgainBtn.isVisible = true
+                            progressIndicator.isVisible = true
                             handleError(lce.throwable.toString())
                         }
                         is LCE.Content -> {
                             adapter.submitList(lce.data)
                             progressIndicator.isVisible = false
-                            swipeRefresh.isRefreshing = false
                         }
                     }
                 }
@@ -113,7 +105,8 @@ class FriendsFragment : Fragment() {
 
     private fun refresh() {
         adapter.submitList(emptyList())
+        binding.tryAgainBtn.isVisible = false
+        binding.progressIndicator.isVisible = false
         viewModel.onRefreshed()
     }
-
 }

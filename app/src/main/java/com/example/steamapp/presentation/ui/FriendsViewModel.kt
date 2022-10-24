@@ -1,14 +1,15 @@
-package com.example.steamapp
+package com.example.steamapp.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.*
+import com.example.steamapp.domain.model.UsersInfo
+import com.example.steamapp.domain.repository.UserInfoRepository
+import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import okhttp3.internal.notifyAll
 
-class SteamViewModel(
-    private val retroDataSource: RetrofitDataSource
+class FriendsViewModel(
+    private val retroDataSource: UserInfoRepository
 ) : ViewModel() {
 
     private val refreshedFlow = MutableSharedFlow<Unit>(
@@ -35,9 +36,9 @@ class SteamViewModel(
         refreshedFlow.tryEmit(Unit)
     }
 
-    private suspend fun runCatch(): LCE<List<InputItem.PlayerInfo>> {
+    private suspend fun runCatch(): LCE<List<UsersInfo>> {
         return runCatching {
-            retroDataSource.loadData()
+            retroDataSource.getUsersInfoLst()
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

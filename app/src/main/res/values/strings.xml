@@ -12,4 +12,10 @@
     <string name="lookingToTrade">looking to trade</string>
     <string name="lookingToPlay">looking to play</string>
     <string name="offline">Offline</string>
+    <string name="friends">Friends</string>
+    <string name="my_profile">My Profile</string>
+    <string name="base_steam_api_url">http://api.steampowered.com/</string>
+    <string name="my_steam_id">76561198277362398</string>
+    <string name="steam_api_key">EA8CD62FA7C21007003DEF64FF96E20C</string>
+    <string name="relationship_is_friend">friend</string>
 </resources>

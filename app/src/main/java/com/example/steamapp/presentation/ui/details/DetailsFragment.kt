@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui.fragments
+package com.example.steamapp.presentation.ui.details
 
 import android.os.Bundle
 import android.view.LayoutInflater

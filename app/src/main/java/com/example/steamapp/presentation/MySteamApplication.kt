@@ -12,25 +12,12 @@ import org.koin.core.context.startKoin
 
 
 class MySteamApplication : Application() {
-
-    init {
-        instance = this
-    }
-
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
             androidContext(this@MySteamApplication)
             modules(viewModelModule, apiModule, repositoryModule)
-        }
-    }
-
-    companion object {
-        private var instance: MySteamApplication? = null
-
-        fun applicationContext() : Context {
-            return requireNotNull(instance?.applicationContext){"Something went wrong!"}
         }
     }
 }

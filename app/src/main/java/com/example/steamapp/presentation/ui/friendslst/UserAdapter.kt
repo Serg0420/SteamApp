@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.friendslst
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,26 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.databinding.UserLstElemBinding
-
-class UserViewHolder(
-    private val binding: UserLstElemBinding,
-    private val onUserElemClicked: (UsersInfo) -> Unit
-) : RecyclerView.ViewHolder(binding.root) {
-
-    fun bind(item: UsersInfo) {
-        with(binding) {
-            avatarPreviewImgv.load(item.avatar)
-            nickTxtv.text = item.nickName
-
-            root.setOnClickListener {
-                onUserElemClicked(item)
-            }
-        }
-    }
-}
 
 class UserAdapter(
     context: Context,

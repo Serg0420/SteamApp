@@ -1,21 +1,16 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.steamapp.BuildConfig
 import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.domain.repository.UserInfoRepository
 import com.example.steamapp.presentation.model.LCE
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
-class FriendsViewModel(
+class MyProfileViewModel(
     private val retroDataSource: UserInfoRepository
 ) : ViewModel() {
-
-    private val refreshedFlow = MutableSharedFlow<Unit>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
 
     private val _dataFlow = flow {
         emit(runCatch())
@@ -25,20 +20,11 @@ class FriendsViewModel(
         replay = 1
     )
 
-    val dataFlow = combine(
-        _dataFlow,
-        refreshedFlow
-            .onStart { emit((Unit)) }
-            .map { runCatch() }
-    ) { _, refreshedfl -> refreshedfl }
+    val dataFlow = _dataFlow
 
-    fun onRefreshed() {
-        refreshedFlow.tryEmit(Unit)
-    }
-
-    private suspend fun runCatch(): LCE<List<UsersInfo>> {
+    private suspend fun runCatch(): LCE<UsersInfo> {
         return runCatching {
-            retroDataSource.getUsersInfoLst()
+            retroDataSource.getUserInfoById(BuildConfig.MY_STEAM_ID)
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

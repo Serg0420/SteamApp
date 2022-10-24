@@ -25,6 +25,19 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "STEAM_API_BASE_URL","\"http://api.steampowered.com/\""
+            buildConfigField "String", "RELATIONSHIP","\"friend\""
+            buildConfigField "String", "MY_STEAM_ID","\"76561198277362398\""
+            buildConfigField "String", "STEAM_API_KEY","\"EA8CD62FA7C21007003DEF64FF96E20C\""
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "STEAM_API_BASE_URL","\"http://api.steampowered.com/\""
+            buildConfigField "String", "RELATIONSHIP","\"friend\""
+            buildConfigField "String", "MY_STEAM_ID","\"76561198277362398\""
+            buildConfigField "String", "STEAM_API_KEY","\"EA8CD62FA7C21007003DEF64FF96E20C\""
         }
     }
     compileOptions {

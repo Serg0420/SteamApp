@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui.fragments
+package com.example.steamapp.presentation.ui.profile
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.example.steamapp.databinding.FragmentMyProfileBinding
 import com.example.steamapp.presentation.model.LCE
-import com.example.steamapp.presentation.ui.MyProfileViewModel
 import com.example.steamapp.presentation.ui.getStatus
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

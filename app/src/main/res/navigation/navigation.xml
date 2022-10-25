@@ -6,6 +6,7 @@
 
     <include app:graph="@navigation/navigation_friends_and_details" />
     <include app:graph="@navigation/navigation_fragment_my_profile" />
+    <include app:graph="@navigation/navigation_fragment_games" />
     <include app:graph="@navigation/navigation_fragment_map" />
 
 </navigation>

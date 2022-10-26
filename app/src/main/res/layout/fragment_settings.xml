@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:padding="16dp"
-        android:text="76561198158574654"
+        android:text="76561198207823113"
         android:textSize="25sp" />
 
 </LinearLayout>

@@ -30,6 +30,11 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".presentation.ui.details.StateTrackerService"
+            android:enabled="true"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${googleMapKey}" />

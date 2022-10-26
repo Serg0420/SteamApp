@@ -3,15 +3,14 @@ package com.example.steamapp.presentation.ui.ownedgames
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.steamapp.domain.model.Game
-import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.domain.repository.GamesRepository
-import com.example.steamapp.domain.repository.UserInfoRepository
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 class GamesViewModel (
-    private val retroDataSource: GamesRepository
+    private val retroDataSource: GamesRepository,
+    private val steamId: String
 ) : ViewModel() {
 
     private val refreshedFlow = MutableSharedFlow<Unit>(
@@ -40,7 +39,7 @@ class GamesViewModel (
 
     private suspend fun runCatch(): LCE<List<Game>> {
         return runCatching {
-            retroDataSource.getUsersOwnedGamesLst()
+            retroDataSource.getUsersOwnedGamesLst(steamId)
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

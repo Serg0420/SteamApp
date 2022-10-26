@@ -11,7 +11,7 @@ interface SteamApi {
     @GET("ISteamUser/GetFriendList/v0001/")
     suspend fun getUsersFriends(
         @Query("key") key: String,
-        @Query("steamid") steamid: Long,
+        @Query("steamid") steamid: String,
         @Query("relationship") relationship: String
     ): FriendList
 

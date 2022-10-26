@@ -12,8 +12,8 @@ import kotlinx.coroutines.coroutineScope
 
 class UsersInfoRepositoryImpl(private val steamApi: SteamApi) : UserInfoRepository {
 
-    override suspend fun getUsersInfoLst(): List<UsersInfo> = coroutineScope {
-        val steamidStrLst = getUserFriendsIds().map { it.steamId }
+    override suspend fun getUsersInfoLstById(userId: String): List<UsersInfo> = coroutineScope {
+        val steamidStrLst = getUserFriendsIds(userId).map { it.steamId }
         steamidStrLst
             .map { id ->
                 async { getUserInfoById(id) }
@@ -21,10 +21,10 @@ class UsersInfoRepositoryImpl(private val steamApi: SteamApi) : UserInfoReposito
             .awaitAll()
     }
 
-    private suspend fun getUserFriendsIds(): List<UsersFriend> {
+    private suspend fun getUserFriendsIds(userId: String): List<UsersFriend> {
         return steamApi.getUsersFriends(
             BuildConfig.STEAM_API_KEY,
-            BuildConfig.MY_STEAM_ID.toLong(),
+            userId,
             BuildConfig.RELATIONSHIP
         ).toDomain()
     }

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/app_name" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/is_it_your_steam_id"
+        android:padding="16dp"
+        android:textSize="25sp"/>
+
+    <EditText
+        android:id="@+id/steamid_edit_txtv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/past_here_your_stem_id"
+        android:padding="16dp"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/enter_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="16dp"
+        android:text="@string/enter"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/test_friend_id_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="16dp"
+        android:text="76561198158574654"
+        android:textSize="25sp" />
+
+</LinearLayout>

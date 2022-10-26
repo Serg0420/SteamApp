@@ -9,7 +9,8 @@ import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.flow.*
 
 class MyProfileViewModel(
-    private val retroDataSource: UserInfoRepository
+    private val retroDataSource: UserInfoRepository,
+    private val steamId: String
 ) : ViewModel() {
 
     private val _dataFlow = flow {
@@ -24,7 +25,7 @@ class MyProfileViewModel(
 
     private suspend fun runCatch(): LCE<UsersInfo> {
         return runCatching {
-            retroDataSource.getUserInfoById(BuildConfig.MY_STEAM_ID)
+            retroDataSource.getUserInfoById(steamId)
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

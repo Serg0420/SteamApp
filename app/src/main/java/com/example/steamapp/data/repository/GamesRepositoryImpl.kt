@@ -8,12 +8,12 @@ import com.example.steamapp.domain.repository.GamesRepository
 
 class GamesRepositoryImpl(private val steamApi: SteamApi) :GamesRepository {
 
-    override suspend fun getUsersOwnedGamesLst(): List<Game> = getUsersGames()
+    override suspend fun getUsersOwnedGamesLst(steamId:String): List<Game> = getUsersGames(steamId)
 
-    private suspend fun getUsersGames(): List<Game> {
+    private suspend fun getUsersGames(steamId:String): List<Game> {
         return steamApi.getUserGames(
             BuildConfig.STEAM_API_KEY,
-            BuildConfig.MY_STEAM_ID,
+            steamId,
             "true"
         ).toDomain()
     }

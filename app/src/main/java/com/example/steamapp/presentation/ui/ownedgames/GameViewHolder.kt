@@ -10,7 +10,7 @@ class GameViewHolder(private val binding: GameLstElemBinding
 
     fun bind(item: Game) {
         with(binding) {
-            logoPreviewImgv.load("http://media.steampowered.com/steamcommunity/public/images/apps/${item.appid}/${item.imgIconUrl}.jpg")
+            logoPreviewImgv.load(item.imgIconUrl)
             nameTxtv.text = item.name
         }
     }

@@ -16,4 +16,9 @@
     <string name="my_profile">My Profile</string>
     <string name="map">Map</string>
     <string name="games">Games</string>
+    <string name="past_here_your_stem_id">Past here your stem id</string>
+    <string name="enter">Enter</string>
+    <string name="settings">Settings</string>
+    <string name="null_field">Field must not be Null!!!</string>
+    <string name="is_it_your_steam_id">Is it your Steam ID?</string>
 </resources>

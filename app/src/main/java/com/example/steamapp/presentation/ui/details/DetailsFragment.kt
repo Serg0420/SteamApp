@@ -5,14 +5,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
+import com.example.steamapp.R
 import com.example.steamapp.databinding.FragmentDetailsBinding
+import com.example.steamapp.domain.model.UserLocation
 import com.example.steamapp.presentation.ui.getStatus
 import com.example.steamapp.presentation.ui.getUser
+import kotlinx.coroutines.flow.launchIn
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+import java.io.IOException
 
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
@@ -51,20 +63,45 @@ class DetailsFragment : Fragment() {
                 findNavController().navigateUp()
             }
 
-            sendCommandToService(ServiceState.START, user.steamId, user.nickName)
+            editBtn.setOnClickListener {
+                editLayout.isVisible = true
+                editBtn.isVisible = false
+            }
+
+            addBtn.setOnClickListener {
+                try {
+                    val viewModel by inject<DetailsViewModel> {
+                        parametersOf(
+                            UserLocation(
+                                steamId = user.steamId,
+                                latitude = latitudeEditTxtv.text.toString().toDouble(),
+                                longitude = longitudeEditTxtv.text.toString().toDouble()
+                            )
+                        )
+                    }
+
+                    viewModel
+                        .dataFlow
+                        .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                        .launchIn(viewLifecycleOwner.lifecycleScope)
+
+                    editLayout.isGone = true
+                    editBtn.isVisible = true
+
+                } catch (exception: Exception) {
+                    handleError(getString(R.string.not_valid_input_value) + exception)
+                }
+            }
+
+            startTrackingBtn.setOnClickListener {
+                sendCommandToService(ServiceState.START, user.steamId, user.nickName)
+            }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        if (StateTrackerService.isServiceRunning) {
-//            sendCommandToService(ServiceState.STOP, "","")
-//        }
     }
 
     private fun sendCommandToService(
@@ -77,5 +114,9 @@ class DetailsFragment : Fragment() {
             .putExtra(StateTrackerService.TRACKING_ID, trackingID)
             .putExtra(StateTrackerService.TRACKING_NICK, trackingNick)
         ContextCompat.startForegroundService(requireContext(), intent)
+    }
+
+    private fun handleError(errorStr: String) {
+        Toast.makeText(requireContext(), errorStr, Toast.LENGTH_SHORT).show()
     }
 }

@@ -1,5 +1,4 @@
-package com.example.steamapp.presentation.ui
-
+package com.example.steamapp.presentation.ui.map
 
 
 import com.example.steamapp.databinding.FragmentMapBinding
@@ -14,14 +13,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.example.steamapp.presentation.model.LCE
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import org.koin.android.ext.android.inject
 
 class GoogleMapFragment : Fragment() {
 
@@ -30,10 +35,11 @@ class GoogleMapFragment : Fragment() {
 
     private var googleMap: GoogleMap? = null
     private var locationListener: LocationSource.OnLocationChangedListener? = null
-
     private val locationService by lazy {
         LocationService(requireContext())
     }
+
+    private val viewModel by inject<GoogleMapViewModel>()
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -68,28 +74,59 @@ class GoogleMapFragment : Fragment() {
 
         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 
-        binding.mapView.getMapAsync { map ->
-            googleMap = map.apply {
+        with(binding) {
+            mapView.getMapAsync { map ->
+                googleMap = map.apply {
 
-                uiSettings.isCompassEnabled = true
-                uiSettings.isZoomControlsEnabled = true
-                uiSettings.isMyLocationButtonEnabled = true
+                    uiSettings.isCompassEnabled = true
+                    uiSettings.isZoomControlsEnabled = true
+                    uiSettings.isMyLocationButtonEnabled = true
 
-                @SuppressLint("MissingPermission")
-                isMyLocationEnabled = hasLocationPermission()
+                    @SuppressLint("MissingPermission")
+                    isMyLocationEnabled = hasLocationPermission()
 
-                setLocationSource(object : LocationSource {
-                    override fun activate(listener: LocationSource.OnLocationChangedListener) {
-                        locationListener = listener
+                    setLocationSource(object : LocationSource {
+                        override fun activate(listener: LocationSource.OnLocationChangedListener) {
+                            locationListener = listener
+                        }
+
+                        override fun deactivate() {
+                            locationListener = null
+                        }
+                    })
+
+//                setOnMarkerClickListener {
+//                    viewModel.onMarkerClicked(it.position.latitude, it.position.longitude)
+//                    true
+//                }
+                }
+                //53.660194, 23.8398159
+
+                viewModel
+                    .dataFlow
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { lce ->
+                        when (lce) {
+                            is LCE.Error -> {
+                                handleError(lce.throwable.toString())
+                            }
+                            is LCE.Content -> {
+                                lce.data.forEach{
+                                    map.addMarker(
+                                        MarkerOptions().position(LatLng(it.latitude, it.longitude))
+                                    )
+                                }
+                            }
+                        }
                     }
-
-                    override fun deactivate() {
-                        locationListener = null
-                    }
-                })
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
             }
+            mapView.onCreate(savedInstanceState)
         }
-        binding.mapView.onCreate(savedInstanceState)
+    }
+
+    private fun handleError(errorStr: String) {
+        Toast.makeText(requireContext(), errorStr, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {

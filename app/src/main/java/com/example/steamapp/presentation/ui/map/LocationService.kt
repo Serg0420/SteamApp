@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Context

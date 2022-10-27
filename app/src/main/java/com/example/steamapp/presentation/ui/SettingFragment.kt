@@ -1,16 +1,20 @@
 package com.example.steamapp.presentation.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.example.steamapp.BuildConfig
 import com.example.steamapp.R
 import com.example.steamapp.databinding.FragmentSettingsBinding
+import com.example.steamapp.presentation.ui.details.ServiceState
+import com.example.steamapp.presentation.ui.details.StateTrackerService
 
 class SettingFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
@@ -58,6 +62,14 @@ class SettingFragment : Fragment() {
             //эта кнопка только для наглядного примера что приложение работает с другими ID
             testFriendIdBtn.setOnClickListener {
                 steamidEditTxtv.setText(testFriendIdBtn.text)
+            }
+
+            stopTrackingBtn.setOnClickListener {
+                if (StateTrackerService.isServiceRunning) {
+                    val intent = Intent(requireContext(), StateTrackerService::class.java)
+                        .putExtra(StateTrackerService.SERVICE_STATE_COMMAND, ServiceState.STOP)
+                    ContextCompat.startForegroundService(requireContext(), intent)
+                }
             }
         }
     }

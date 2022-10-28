@@ -1,7 +1,6 @@
 package com.example.steamapp.presentation.ui.map
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.steamapp.domain.model.UserLocation
 import com.example.steamapp.domain.repository.UserLocationRepository
 import com.example.steamapp.presentation.model.LCE
@@ -45,6 +44,18 @@ class GoogleMapViewModel(
 
     fun onMarkerClicked(latitude: Double, longitude: Double) {
         markerFlow.tryEmit(latitude to longitude)
+    }
+
+    fun onDeleteBtnClicked(userLocation: UserLocation) {
+        flow<Nothing> {
+            runCatching {
+                dataSource.deleteUser(userLocation)
+            }
+        }.shareIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            replay = 1
+        )
     }
 
     private suspend fun runCatch(): LCE<List<UserLocation>> {

@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import coil.load
+import com.example.steamapp.R
 import com.example.steamapp.presentation.model.LCE
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -117,7 +118,7 @@ class GoogleMapFragment : Fragment() {
                     .onEach { lce ->
                         when (lce) {
                             is LCE.Error -> {
-                                handleError(lce.throwable.toString())
+                                handleErrorOrMessage(lce.throwable.toString())
                             }
                             is LCE.Content -> {
                                 lce.data.forEach {
@@ -136,12 +137,17 @@ class GoogleMapFragment : Fragment() {
                 .onEach { lce ->
                     when (lce) {
                         is LCE.Error -> {
-                            handleError(lce.throwable.toString())
+                            handleErrorOrMessage(lce.throwable.toString())
                         }
                         is LCE.Content -> {
                             with(bottomSheetDetails) {
                                 avatarPreviewImgv.load(lce.data.avatarUrl)
                                 nickTxtv.text = lce.data.nickName
+
+                                deleteBtn.setOnClickListener {
+                                    viewModel.onDeleteBtnClicked(lce.data)
+                                    handleErrorOrMessage(getString(R.string.tag_deleted))
+                                }
                             }
                             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
                         }
@@ -153,7 +159,7 @@ class GoogleMapFragment : Fragment() {
         }
     }
 
-    private fun handleError(errorStr: String) {
+    private fun handleErrorOrMessage(errorStr: String) {
         Toast.makeText(requireContext(), errorStr, Toast.LENGTH_SHORT).show()
     }
 

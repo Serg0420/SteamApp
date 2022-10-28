@@ -27,4 +27,6 @@
     <string name="not_valid_input_value">\"Value must be Double and not NULL. \"</string>
     <string name="stop_tracking">STOP TRACKING</string>
     <string name="start_status_tracking">START STATUS TRACKING</string>
+    <string name="delete_tag">DELETE TAG</string>
+    <string name="tag_deleted">Tag will be deleted</string>
 </resources>

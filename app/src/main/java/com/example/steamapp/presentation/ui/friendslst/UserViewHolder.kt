@@ -9,7 +9,6 @@ class UserViewHolder(
     private val binding: UserLstElemBinding,
     private val onUserElemClicked: (UsersInfo) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
-
     fun bind(item: UsersInfo) {
         with(binding) {
             avatarPreviewImgv.load(item.avatar)

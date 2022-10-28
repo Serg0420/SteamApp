@@ -17,10 +17,9 @@
             android:id="@+id/logo_preview_imgv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            tools:src="@tools:sample/avatars"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            />
+            tools:src="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/name_txtv"

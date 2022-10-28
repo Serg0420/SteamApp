@@ -25,7 +25,7 @@ import org.koin.core.parameter.parametersOf
 class FriendsFragment : Fragment() {
     private var _binding: FragmentFriendsBinding? = null
     private val binding
-        get() = requireNotNull(_binding) {"View was destroyed"}
+        get() = requireNotNull(_binding) { "View was destroyed" }
 
     private val adapter by lazy {
         UserAdapter(
@@ -44,7 +44,7 @@ class FriendsFragment : Fragment() {
         requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
-    private val viewModel by inject<FriendsViewModel>{
+    private val viewModel by inject<FriendsViewModel> {
         parametersOf(sharedPreferences.getString(KEY_STEAM_ID, BuildConfig.MY_STEAM_ID))
     }
 

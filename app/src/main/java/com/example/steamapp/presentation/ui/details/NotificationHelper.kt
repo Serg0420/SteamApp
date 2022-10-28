@@ -9,8 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.steamapp.R
 import com.example.steamapp.presentation.MainActivity
 
-class NotificationHelper (private val context: Context) {
-
+class NotificationHelper(private val context: Context) {
     private val notificationManager = NotificationManagerCompat.from(context)
 
     private val pendIntent: PendingIntent =
@@ -23,7 +22,7 @@ class NotificationHelper (private val context: Context) {
 
     val notificationBuilder: NotificationCompat.Builder
         get() = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_online_tracker)
             .setContentTitle(context.getString(R.string.app_name))
             .setContentIntent(pendIntent)
 

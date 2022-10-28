@@ -1,31 +1,23 @@
 package com.example.steamapp.presentation.ui.details
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.steamapp.domain.model.UserLocation
 import com.example.steamapp.domain.repository.UserLocationRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
 
 class DetailsViewModel(
-    private val dataSource: UserLocationRepository,
-    private val userLocation: UserLocation
+    private val dataSource: UserLocationRepository
 ) : ViewModel() {
-
-    private val _dataFlow = flow {
-        emit(runCatch())
-    }.shareIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        replay = 1
+    private val locationFlow = MutableSharedFlow<UserLocation>(
+        replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    val dataFlow = _dataFlow
+    val dataFlow = locationFlow.onEach {
+        dataSource.insertUsers(it)
+    }
 
-    private suspend fun runCatch() {
-        runCatching {
-            dataSource.insertUsers(userLocation)
-        }
+    fun addLocation(userLocation: UserLocation) {
+        locationFlow.tryEmit(userLocation)
     }
 }

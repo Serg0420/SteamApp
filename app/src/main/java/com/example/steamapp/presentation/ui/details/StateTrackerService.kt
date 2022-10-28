@@ -40,8 +40,8 @@ class StateTrackerService : Service() {
             ServiceState.STOP -> endTrackerService()
         }
 
-        userSteamId=intent?.getSerializableExtra(TRACKING_ID).toString()
-        userSteamNick=intent?.getSerializableExtra(TRACKING_NICK).toString()
+        userSteamId = intent?.getSerializableExtra(TRACKING_ID).toString()
+        userSteamNick = intent?.getSerializableExtra(TRACKING_NICK).toString()
 
         return START_NOT_STICKY
     }
@@ -110,12 +110,12 @@ class StateTrackerService : Service() {
     private fun startStatusTracking() {
         statusJob = coroutineScope.launch {
             while (true) {
-                when (val lce=runCatch()) {
+                when (val lce = runCatch()) {
                     is LCE.Error -> {
                         handleError(lce.throwable.toString())
                     }
                     is LCE.Content -> {
-                        currentOnlineStatus=lce.data.getStatus(this@StateTrackerService)
+                        currentOnlineStatus = lce.data.getStatus(this@StateTrackerService)
                     }
                 }
                 updateServiceState()
@@ -149,6 +149,6 @@ class StateTrackerService : Service() {
         var isServiceRunning = false
             private set
 
-        private const val INIT_STATUS="..."
+        private const val INIT_STATUS = "..."
     }
 }

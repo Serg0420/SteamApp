@@ -8,7 +8,6 @@
     <fragment
         android:id="@+id/fragment_games"
         android:name="com.example.steamapp.presentation.ui.ownedgames.GamesFragment"
-        tools:layout="@layout/fragment_games">
-    </fragment>
+        tools:layout="@layout/fragment_games" />
 
 </navigation>

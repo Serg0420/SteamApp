@@ -20,12 +20,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.example.steamapp.presentation.model.LCE
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.android.ext.android.inject
 
 class GoogleMapFragment : Fragment() {
@@ -75,6 +77,8 @@ class GoogleMapFragment : Fragment() {
         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 
         with(binding) {
+            val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetFrame)
+
             mapView.getMapAsync { map ->
                 googleMap = map.apply {
 
@@ -95,12 +99,17 @@ class GoogleMapFragment : Fragment() {
                         }
                     })
 
-//                setOnMarkerClickListener {
-//                    viewModel.onMarkerClicked(it.position.latitude, it.position.longitude)
-//                    true
-//                }
+                    map.setOnMapClickListener {
+                        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        }
+                    }
+
+                    setOnMarkerClickListener {
+                        viewModel.onMarkerClicked(it.position.latitude, it.position.longitude)
+                        true
+                    }
                 }
-                //53.660194, 23.8398159
 
                 viewModel
                     .dataFlow
@@ -111,7 +120,7 @@ class GoogleMapFragment : Fragment() {
                                 handleError(lce.throwable.toString())
                             }
                             is LCE.Content -> {
-                                lce.data.forEach{
+                                lce.data.forEach {
                                     map.addMarker(
                                         MarkerOptions().position(LatLng(it.latitude, it.longitude))
                                     )
@@ -121,6 +130,25 @@ class GoogleMapFragment : Fragment() {
                     }
                     .launchIn(viewLifecycleOwner.lifecycleScope)
             }
+
+            viewModel
+                .selectedMarkerFlow
+                .onEach { lce ->
+                    when (lce) {
+                        is LCE.Error -> {
+                            handleError(lce.throwable.toString())
+                        }
+                        is LCE.Content -> {
+                            with(bottomSheetDetails) {
+                                avatarPreviewImgv.load(lce.data.avatarUrl)
+                                nickTxtv.text = lce.data.nickName
+                            }
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                        }
+                    }
+                }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+
             mapView.onCreate(savedInstanceState)
         }
     }
@@ -172,6 +200,6 @@ class GoogleMapFragment : Fragment() {
     }
 
     companion object {
-        private const val DEFAULT_CAMERA_ZOOM = 17f
+        private const val DEFAULT_CAMERA_ZOOM = 1f
     }
 }

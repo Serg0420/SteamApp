@@ -23,20 +23,19 @@ import com.example.steamapp.presentation.ui.getStatus
 import com.example.steamapp.presentation.ui.getUser
 import kotlinx.coroutines.flow.launchIn
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
-import java.io.IOException
 
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding
         get() = requireNotNull(_binding) { "View was destroyed" }
 
+    private val viewModel by inject<DetailsViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         return FragmentDetailsBinding.inflate(inflater, container, false)
             .also { binding ->
                 _binding = binding
@@ -63,6 +62,11 @@ class DetailsFragment : Fragment() {
                 findNavController().navigateUp()
             }
 
+            viewModel
+                .dataFlow
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+
             editBtn.setOnClickListener {
                 editLayout.isVisible = true
                 editBtn.isVisible = false
@@ -70,21 +74,15 @@ class DetailsFragment : Fragment() {
 
             addBtn.setOnClickListener {
                 try {
-                    val viewModel by inject<DetailsViewModel> {
-                        parametersOf(
-                            UserLocation(
-                                steamId = user.steamId,
-                                latitude = latitudeEditTxtv.text.toString().toDouble(),
-                                longitude = longitudeEditTxtv.text.toString().toDouble()
-                            )
+                    viewModel.addLocation(
+                        UserLocation(
+                            steamId = user.steamId,
+                            nickName = user.nickName,
+                            avatarUrl = user.avatar,
+                            latitude = latitudeEditTxtv.text.toString().toDouble(),
+                            longitude = longitudeEditTxtv.text.toString().toDouble()
                         )
-                    }
-
-                    viewModel
-                        .dataFlow
-                        .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                        .launchIn(viewLifecycleOwner.lifecycleScope)
-
+                    )
                     editLayout.isGone = true
                     editBtn.isVisible = true
 

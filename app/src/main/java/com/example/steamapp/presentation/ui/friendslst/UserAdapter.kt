@@ -13,7 +13,6 @@ class UserAdapter(
     context: Context,
     private val onUserElemClicked: (UsersInfo) -> Unit
 ) : ListAdapter<UsersInfo, RecyclerView.ViewHolder>(DIFF_UTIL) {
-
     private val layoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -33,7 +32,6 @@ class UserAdapter(
     }
 
     companion object {
-
         private val DIFF_UTIL = object : DiffUtil.ItemCallback<UsersInfo>() {
             override fun areItemsTheSame(oldItem: UsersInfo, newItem: UsersInfo): Boolean {
                 return oldItem.steamId == newItem.steamId

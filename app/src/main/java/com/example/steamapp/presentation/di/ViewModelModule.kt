@@ -8,7 +8,7 @@ import com.example.steamapp.presentation.ui.ownedgames.GamesViewModel
 import com.example.steamapp.presentation.ui.map.GoogleMapViewModel
 import com.example.steamapp.presentation.ui.details.DetailsViewModel
 
-val viewModelModule= module {
+val viewModelModule = module {
     viewModelOf(::FriendsViewModel)
     viewModelOf(::MyProfileViewModel)
     viewModelOf(::GamesViewModel)

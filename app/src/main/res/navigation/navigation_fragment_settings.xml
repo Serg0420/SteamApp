@@ -8,7 +8,6 @@
     <fragment
         android:id="@+id/fragment_settings"
         android:name="com.example.steamapp.presentation.ui.SettingFragment"
-        tools:layout="@layout/fragment_settings">
-    </fragment>
+        tools:layout="@layout/fragment_settings" />
 
 </navigation>

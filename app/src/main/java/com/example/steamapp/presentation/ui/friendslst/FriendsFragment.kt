@@ -1,6 +1,5 @@
 package com.example.steamapp.presentation.ui.friendslst
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +12,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.steamapp.BuildConfig
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import com.example.steamapp.domain.repository.AppUserIdRepository
 import com.example.steamapp.presentation.model.LCE
 import com.example.steamapp.presentation.ui.addVerticalSeparation
 import kotlinx.coroutines.flow.launchIn
@@ -40,12 +39,12 @@ class FriendsFragment : Fragment() {
         )
     }
 
-    private val sharedPreferences by lazy {
-        requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val appUserIdRep by inject<AppUserIdRepository> {
+        parametersOf(requireContext())
     }
 
     private val viewModel by inject<FriendsViewModel> {
-        parametersOf(sharedPreferences.getString(KEY_STEAM_ID, BuildConfig.MY_STEAM_ID))
+        parametersOf(appUserIdRep.getAppUserId())
     }
 
     override fun onCreateView(
@@ -111,10 +110,5 @@ class FriendsFragment : Fragment() {
         binding.tryAgainBtn.isVisible = false
         binding.progressIndicator.isVisible = false
         viewModel.onRefreshed()
-    }
-
-    companion object {
-        private const val PREFS_NAME = "settings"
-        private const val KEY_STEAM_ID = "STEAM_ID"
     }
 }

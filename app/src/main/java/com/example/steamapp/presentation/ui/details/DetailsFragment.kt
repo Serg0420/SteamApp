@@ -10,26 +10,24 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.setupWithNavController
 import coil.load
 import com.example.steamapp.R
 import com.example.steamapp.databinding.FragmentDetailsBinding
 import com.example.steamapp.domain.model.UserLocation
 import com.example.steamapp.presentation.ui.getStatus
 import com.example.steamapp.presentation.ui.getUser
-import kotlinx.coroutines.flow.launchIn
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding
         get() = requireNotNull(_binding) { "View was destroyed" }
 
-    private val viewModel by inject<DetailsViewModel>()
+    private val viewModel by viewModel<DetailsViewModel>()
+    private val args: DetailsFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +44,6 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val args: DetailsFragmentArgs by navArgs()
         val user = args.getUser()
 
         with(binding) {
@@ -57,15 +54,7 @@ class DetailsFragment : Fragment() {
             val status = user.getStatus(requireContext())
 
             statusTxtv.append(status)
-
-            toolbar.setNavigationOnClickListener {
-                findNavController().navigateUp()
-            }
-
-            viewModel
-                .dataFlow
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+            toolbar.setupWithNavController(findNavController())
 
             editBtn.setOnClickListener {
                 editLayout.isVisible = true

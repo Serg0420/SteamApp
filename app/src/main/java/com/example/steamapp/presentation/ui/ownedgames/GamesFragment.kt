@@ -1,6 +1,5 @@
 package com.example.steamapp.presentation.ui.ownedgames
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +11,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.steamapp.BuildConfig
 import com.example.steamapp.databinding.FragmentGamesBinding
+import com.example.steamapp.domain.repository.AppUserIdRepository
 import com.example.steamapp.presentation.model.LCE
 import com.example.steamapp.presentation.ui.addVerticalSeparation
 import kotlinx.coroutines.flow.launchIn
@@ -24,18 +23,18 @@ import org.koin.core.parameter.parametersOf
 class GamesFragment : Fragment() {
     private var _binding: FragmentGamesBinding? = null
     private val binding
-        get() = requireNotNull(_binding) {"View was destroyed"}
+        get() = requireNotNull(_binding) { "View was destroyed" }
 
     private val adapter by lazy {
         GameAdapter(requireContext())
     }
 
-    private val sharedPreferences by lazy {
-        requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val appUserIdRep by inject<AppUserIdRepository> {
+        parametersOf(requireContext())
     }
 
-    private val viewModel by inject<GamesViewModel>{
-        parametersOf( sharedPreferences.getString(KEY_STEAM_ID, BuildConfig.MY_STEAM_ID))
+    private val viewModel by inject<GamesViewModel> {
+        parametersOf(appUserIdRep.getAppUserId())
     }
 
     override fun onCreateView(
@@ -101,10 +100,5 @@ class GamesFragment : Fragment() {
         binding.tryAgainBtn.isVisible = false
         binding.progressIndicator.isVisible = false
         viewModel.onRefreshed()
-    }
-
-    companion object {
-        private const val PREFS_NAME = "settings"
-        private const val KEY_STEAM_ID = "STEAM_ID"
     }
 }

@@ -8,6 +8,8 @@ import com.example.steamapp.domain.repository.GamesRepository
 import com.example.steamapp.data.repository.GamesRepositoryImpl
 import com.example.steamapp.domain.repository.UserLocationRepository
 import com.example.steamapp.data.repository.UserLocationRepositoryImpl
+import com.example.steamapp.domain.repository.AppUserIdRepository
+import com.example.steamapp.data.repository.AppUserIdRepositoryImpl
 import org.koin.core.module.dsl.bind
 
 val repositoryModule=module{
@@ -19,5 +21,8 @@ val repositoryModule=module{
     }
     singleOf(::UserLocationRepositoryImpl){
         bind<UserLocationRepository>()
+    }
+    singleOf(::AppUserIdRepositoryImpl){
+        bind<AppUserIdRepository>()
     }
 }

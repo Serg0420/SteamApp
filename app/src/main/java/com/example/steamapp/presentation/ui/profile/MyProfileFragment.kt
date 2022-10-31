@@ -1,6 +1,5 @@
 package com.example.steamapp.presentation.ui.profile
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +10,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import coil.load
-import com.example.steamapp.BuildConfig
 import com.example.steamapp.databinding.FragmentMyProfileBinding
+import com.example.steamapp.domain.repository.AppUserIdRepository
 import com.example.steamapp.presentation.model.LCE
 import com.example.steamapp.presentation.ui.getStatus
 import kotlinx.coroutines.flow.launchIn
@@ -25,12 +24,12 @@ class MyProfileFragment : Fragment() {
     private val binding
         get() = requireNotNull(_binding) { "View was destroyed" }
 
-    private val sharedPreferences by lazy {
-        requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val appUserIdRep by inject<AppUserIdRepository> {
+        parametersOf(requireContext())
     }
 
     private val viewModel by inject<MyProfileViewModel> {
-        parametersOf( sharedPreferences.getString(KEY_STEAM_ID, BuildConfig.MY_STEAM_ID))
+        parametersOf(appUserIdRep.getAppUserId())
     }
 
     override fun onCreateView(
@@ -77,10 +76,5 @@ class MyProfileFragment : Fragment() {
 
     private fun handleError(errorStr: String) {
         Toast.makeText(requireContext(), errorStr, Toast.LENGTH_SHORT).show()
-    }
-
-    companion object {
-        private const val PREFS_NAME = "settings"
-        private const val KEY_STEAM_ID = "STEAM_ID"
     }
 }

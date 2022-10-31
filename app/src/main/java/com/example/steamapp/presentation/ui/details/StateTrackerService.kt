@@ -7,7 +7,6 @@ import android.os.IBinder
 import android.widget.Toast
 import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.domain.repository.UserInfoRepository
-import com.example.steamapp.presentation.model.LCE
 import com.example.steamapp.presentation.ui.getStatus
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
@@ -54,12 +53,10 @@ class StateTrackerService : Service() {
 
     private fun startTracking() {
         serviceState = ServiceState.START
-
         currentOnlineStatus = INIT_STATUS
 
         startForeground(NOTIFICATION_ID, notificationHelper.notificationBuilder.build())
         updateServiceState()
-
         startStatusTracking()
     }
 
@@ -110,28 +107,22 @@ class StateTrackerService : Service() {
     private fun startStatusTracking() {
         statusJob = coroutineScope.launch {
             while (true) {
-                when (val lce = runCatch()) {
-                    is LCE.Error -> {
-                        handleError(lce.throwable.toString())
+                runCatch()
+                    .onSuccess {
+                        currentOnlineStatus = it.getStatus(this@StateTrackerService)
                     }
-                    is LCE.Content -> {
-                        currentOnlineStatus = lce.data.getStatus(this@StateTrackerService)
-                    }
-                }
+                    .onFailure { handleError(it.toString()) }
+
                 updateServiceState()
                 delay(5000)
             }
         }
     }
 
-    private suspend fun runCatch(): LCE<UsersInfo> {
+    private suspend fun runCatch(): Result<UsersInfo> {
         return runCatching {
             retroDataSource.getUserInfoById(userSteamId)
         }
-            .fold(
-                onSuccess = { LCE.Content(it) },
-                onFailure = { LCE.Error(it) }
-            )
     }
 
     private fun handleError(errorStr: String) {

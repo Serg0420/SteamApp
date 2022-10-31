@@ -5,29 +5,24 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.example.steamapp.databinding.GameLstElemBinding
 import com.example.steamapp.domain.model.Game
 
 class GameAdapter(
     context: Context
-) : ListAdapter<Game, RecyclerView.ViewHolder>(DIFF_UTIL) {
+) : ListAdapter<Game, GameViewHolder>(DIFF_UTIL) {
 
     private val layoutInflater = LayoutInflater.from(context)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
         return GameViewHolder(
             binding = GameLstElemBinding.inflate(layoutInflater, parent, false)
         )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
         val item = getItem(position)
-
-        if (holder is GameViewHolder) {
-            if (item !is Game) return
-            holder.bind(item)
-        }
+        return holder.bind(item)
     }
 
     companion object {

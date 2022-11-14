@@ -14,36 +14,102 @@
         app:navigationIcon="@drawable/arrow_back"
         app:title="@string/app_name" />
 
-    <ImageView
-        android:id="@+id/avatar_imgv"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:padding="16dp"
-        tools:src="@tools:sample/avatars" />
+        tools:ignore="ScrollViewCount">
 
-    <TextView
-        android:id="@+id/id_txtv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/id"
-        android:textSize="25sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/name_txtv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/name"
-        android:textSize="25sp" />
+            <ImageView
+                android:id="@+id/avatar_imgv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:adjustViewBounds="true"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                tools:src="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/status_txtv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/status"
-        android:textSize="25sp" />
+            <TextView
+                android:id="@+id/id_txtv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/id"
+                android:textSize="25sp" />
 
+            <TextView
+                android:id="@+id/name_txtv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/name"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/status_txtv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/status"
+                android:textSize="25sp" />
+
+            <Button
+                android:id="@+id/start_tracking_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="@string/start_status_tracking"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/edit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="@string/edit_user_home_location"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/edit_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/latitude_edit_txtv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/past_here_latitude"
+                    android:padding="16dp"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/longitude_edit_txtv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/past_here_longitude"
+                    android:padding="16dp"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/add_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:padding="16dp"
+                    android:text="@string/enter"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
 </LinearLayout>

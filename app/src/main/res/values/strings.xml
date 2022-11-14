@@ -14,8 +14,19 @@
     <string name="offline">Offline</string>
     <string name="friends">Friends</string>
     <string name="my_profile">My Profile</string>
-    <string name="base_steam_api_url">http://api.steampowered.com/</string>
-    <string name="my_steam_id">76561198277362398</string>
-    <string name="steam_api_key">EA8CD62FA7C21007003DEF64FF96E20C</string>
-    <string name="relationship_is_friend">friend</string>
+    <string name="map">Map</string>
+    <string name="games">Games</string>
+    <string name="past_here_your_stem_id">Past here your stem id</string>
+    <string name="enter">Enter</string>
+    <string name="settings">Settings</string>
+    <string name="null_field">Field must not be Null!!!</string>
+    <string name="is_it_your_steam_id">Is it your Steam ID?</string>
+    <string name="past_here_latitude">Past here latitude</string>
+    <string name="past_here_longitude">Past here longitude</string>
+    <string name="edit_user_home_location">Edit user home location</string>
+    <string name="not_valid_input_value">\"Value must be Double and not NULL. \"</string>
+    <string name="stop_tracking">STOP TRACKING</string>
+    <string name="start_status_tracking">START STATUS TRACKING</string>
+    <string name="delete_tag">DELETE TAG</string>
+    <string name="tag_deleted">Tag will be deleted</string>
 </resources>

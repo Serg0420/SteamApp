@@ -1,20 +1,17 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.steamapp.R
+import com.example.steamapp.BuildConfig
 import com.example.steamapp.domain.model.UsersInfo
 import com.example.steamapp.domain.repository.UserInfoRepository
-import com.example.steamapp.presentation.MySteamApplication
 import com.example.steamapp.presentation.model.LCE
 import kotlinx.coroutines.flow.*
 
 class MyProfileViewModel(
-    private val retroDataSource: UserInfoRepository
+    private val retroDataSource: UserInfoRepository,
+    private val steamId: String
 ) : ViewModel() {
-    private val mySteamId by lazy {
-        MySteamApplication.applicationContext().getString(R.string.my_steam_id)
-    }
 
     private val _dataFlow = flow {
         emit(runCatch())
@@ -28,7 +25,7 @@ class MyProfileViewModel(
 
     private suspend fun runCatch(): LCE<UsersInfo> {
         return runCatching {
-            retroDataSource.getUserInfoById(mySteamId)
+            retroDataSource.getUserInfoById(steamId)
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

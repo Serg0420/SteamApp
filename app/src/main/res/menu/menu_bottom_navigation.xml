@@ -9,4 +9,19 @@
         android:id="@+id/navigation_fragment_my_profile"
         android:icon="@drawable/ic_account_circle"
         android:title="@string/my_profile" />
+
+    <item
+        android:id="@+id/navigation_fragment_games"
+        android:icon="@drawable/ic_videogame"
+        android:title="@string/games" />
+
+    <item
+        android:id="@+id/navigation_fragment_map"
+        android:icon="@drawable/ic_map"
+        android:title="@string/map" />
+
+    <item
+        android:id="@+id/navigation_fragment_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings" />
 </menu>

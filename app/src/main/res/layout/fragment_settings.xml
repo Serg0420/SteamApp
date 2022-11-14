@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -13,38 +12,46 @@
         android:layout_height="wrap_content"
         app:title="@string/app_name" />
 
-    <ImageView
-        android:id="@+id/avatar_imgv"
+    <TextView
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/is_it_your_steam_id"
+        android:padding="16dp"
+        android:textSize="25sp"/>
+
+    <EditText
+        android:id="@+id/steamid_edit_txtv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/past_here_your_stem_id"
+        android:padding="16dp"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/enter_btn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:padding="16dp"
-        tools:src="@tools:sample/avatars"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"/>
-
-    <TextView
-        android:id="@+id/id_txtv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/id"
+        android:text="@string/enter"
         android:textSize="25sp" />
 
-    <TextView
-        android:id="@+id/name_txtv"
+    <Button
+        android:id="@+id/stop_tracking_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:padding="16dp"
-        android:text="@string/name"
+        android:text="@string/stop_tracking"
         android:textSize="25sp" />
 
-    <TextView
-        android:id="@+id/status_txtv"
+    <Button
+        android:id="@+id/test_friend_id_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:padding="16dp"
-        android:text="@string/status"
+        android:text="76561198207823113"
         android:textSize="25sp" />
 
 </LinearLayout>

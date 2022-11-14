@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui.fragments
+package com.example.steamapp.presentation.ui.friendslst
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,17 +13,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.steamapp.databinding.FragmentFriendsBinding
+import com.example.steamapp.domain.repository.AppUserIdRepository
 import com.example.steamapp.presentation.model.LCE
-import com.example.steamapp.presentation.ui.FriendsViewModel
-import com.example.steamapp.presentation.ui.UserAdapter
 import com.example.steamapp.presentation.ui.addVerticalSeparation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class FriendsFragment : Fragment() {
-
     private var _binding: FragmentFriendsBinding? = null
+    private val binding
+        get() = requireNotNull(_binding) { "View was destroyed" }
 
     private val adapter by lazy {
         UserAdapter(
@@ -38,12 +39,13 @@ class FriendsFragment : Fragment() {
         )
     }
 
-    private val viewModel by inject<FriendsViewModel>()
+    private val appUserIdRep by inject<AppUserIdRepository> {
+        parametersOf(requireContext())
+    }
 
-    private val binding
-        get() = requireNotNull(_binding) {
-            "View was destroyed"
-        }
+    private val viewModel by inject<FriendsViewModel> {
+        parametersOf(appUserIdRep.getAppUserId())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

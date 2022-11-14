@@ -1,4 +1,4 @@
-package com.example.steamapp.presentation.ui
+package com.example.steamapp.presentation.ui.friendslst
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +9,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 class FriendsViewModel(
-    private val retroDataSource: UserInfoRepository
+    private val retroDataSource: UserInfoRepository,
+    private val steamId: String
 ) : ViewModel() {
 
     private val refreshedFlow = MutableSharedFlow<Unit>(
@@ -38,7 +39,7 @@ class FriendsViewModel(
 
     private suspend fun runCatch(): LCE<List<UsersInfo>> {
         return runCatching {
-            retroDataSource.getUsersInfoLst()
+            retroDataSource.getUsersInfoLstById(steamId)
         }
             .fold(
                 onSuccess = { LCE.Content(it) },

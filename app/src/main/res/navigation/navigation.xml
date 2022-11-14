@@ -2,9 +2,12 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation"
-    app:startDestination="@id/navigation_friends_and_details">
+    app:startDestination="@id/navigation_fragment_settings">
 
     <include app:graph="@navigation/navigation_friends_and_details" />
     <include app:graph="@navigation/navigation_fragment_my_profile" />
+    <include app:graph="@navigation/navigation_fragment_games" />
+    <include app:graph="@navigation/navigation_fragment_map" />
+    <include app:graph="@navigation/navigation_fragment_settings" />
 
 </navigation>
